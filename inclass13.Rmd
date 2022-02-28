@@ -49,6 +49,8 @@ primaryPolls<-read_csv(dataURL)
 primaryPolls$start_date<-as.Date(primaryPolls$start_date, "%m/%d/%y")
 
 # Your commented solution goes here.
+# Change the theme to minimal
+# Change axis labels and legends from defaults
 ```
 
 
