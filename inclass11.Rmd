@@ -1,5 +1,6 @@
 ---
 title: "Applied Statistical Programming - Error Handling"
+author: "Alex, Peter, Amaan, Patrick"
 date: "2/21/2022"
 header-includes:
    - \usepackage{amsmath}
