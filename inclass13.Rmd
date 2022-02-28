@@ -33,7 +33,7 @@ The data is associated with 2020 Democratic primary elections. Polling results f
 \end{itemize}
 
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 # Remove eval=FALSE to have this code block run.
 
 # Load library dependencies
@@ -47,8 +47,25 @@ dataURL <- 'https://jmontgomery.github.io/PDS/Datasets/president_primary_polls_f
 primaryPolls<-read_csv(dataURL)
 # Format the date
 primaryPolls$start_date<-as.Date(primaryPolls$start_date, "%m/%d/%y")
+```
 
-# Your commented solution goes here.
+  * 1. Find separate data for each state.
+  
+    * New Hampshire.
+```{r}
+newhampshire <- primaryPolls[which(primaryPolls$state == "New Hampshire"),]
+```
+
+
+    * Nevada.
+```{r}
+nevada <- primaryPolls[which(primaryPolls$state == "Nevada"),]
+```
+
+
+    * South Carolina.
+```{r}
+southcarolina <- primaryPolls[which(primaryPolls$state == "South Carolina"),]
 ```
 
 
