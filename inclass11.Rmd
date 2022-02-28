@@ -1,5 +1,6 @@
 ---
 title: "Applied Statistical Programming - Error Handling"
+author: "Alex, Peter, Amaan, Patrick"
 date: "2/21/2022"
 header-includes:
    - \usepackage{amsmath}
@@ -54,7 +55,7 @@ Bobby's function \texttt{gramschmidt} is provided below. You can verify the code
 
 \begin{itemize}
    \item $u_1 = a_1$, $e_1 = u_1 / \Vert u_1\Vert$
-   \item $u_2 = a_2 - (a_{2}^{\intercal} e_2)*e_1$, $e_2 = u_2 / \Vert u_2\Vert$
+   \item $u_2 = a_2 - (a_{2}^{\intercal} e_1)*e_1$, $e_2 = u_2 / \Vert u_2\Vert$
    \item $u_3 = a_3 - (a_{3}^{\intercal} e_1)*e_1 - (a_{3}^{\intercal} e_2)*e_2$, $e_3 = u_3 / \Vert u_3\Vert$
    \item $\dots$
    \item $u_n = a_n - \sum\limits^{n-1}_{j=1} (a_{n}^{\intercal}e_{j})*e_j$, $e_n = u_n / \Vert u_n\Vert$
@@ -67,7 +68,6 @@ Bobby's function \texttt{gramschmidt} is provided below. You can verify the code
 ```{r tidy=TRUE, eval=TRUE}
 gramschmidt <- function(x) {
   # Get the number of rows and columns of the matrix
-  browser()
   n <- ncol(x)
   m <- nrow(x)
 
@@ -76,10 +76,13 @@ gramschmidt <- function(x) {
   R <- matrix(0, n, n)
 
   # Gram-Schmidt process
-  for (j in 1:(n - 1)) {
+  for (j in 1:n) #changed n-1 to n 
+    {
     v <- x[, j]
-    if (j >= 1) {
-      for (i in 1:j) {
+    if (j > 1) #removed the equal sign
+      {
+      for (i in 1:(j-1)) #changed j to j-1
+           {
         R[i, j] <- t(Q[, i]) %*% x[, j]
         v <- v - R[i, j] * Q[, i]
       }
@@ -93,8 +96,11 @@ gramschmidt <- function(x) {
   return(QRdecomp)
 }
 
-A <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2)
-test <- gramschmidt(A)
+A <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2) #2 by 2 test matrix
+B <- matrix(rnorm(9), nrow = 3, ncol = 3) #3 by 3 test matrix
 
-test$Q %*% test$R
+gramschmidt(A)
+gramschmidt(B)
+
+
 ```

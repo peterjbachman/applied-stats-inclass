@@ -47,3 +47,8 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+.DS_Store
+Tweets.csv.zip
+Tweets.csv
+plots/tweets.pdf
+inclass12.pdf

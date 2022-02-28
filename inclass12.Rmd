@@ -1,6 +1,7 @@
 ---
 title: "Applied Statistical Programming - Projects"
 date: "2/23/2022"
+author: "Amaan, Alex, Patrick, Peter"
 header-includes:
    - \usepackage{amsmath}
    - \usepackage{geometry}
@@ -31,17 +32,48 @@ In this exercise, you will plot a Twitter user's activity for a single day disti
 
 You will need to generate count variables to make this plot. You will also need to use the \texttt{lubridate} package to parse time from the full date-time stamp. Assuming you have already subsetted the data to only focus on the user \texttt{a\_silberberg}, you can create a new variable in the data for the time with the following code. You will also need to wrap \texttt{newtime} in a \texttt{as.POSIXct()} statement so R knows how to handle the time data.
 
-```{r eval=FALSE}
-# Remove eval=FALSE to have this code block run.
+```{r tidy=TRUE}
 library(lubridate)
-# Assume the "only_a_Silberberg" subsetted data already exists.
+library(plyr)
+df <- read.csv("Tweets.csv")
+
+only_a_Silberberg <- df[df$ScreenName == "a_silberberg", ]
+
 dates <- as.POSIXct(only_a_Silberberg$CreatedTime, format = "%Y-%m-%d %H:%M:%S")
 # Extra the day from the full time stamp
 days <- format(dates, format = "%Y-%m-%d")
 # Subset the data again so only tweets on November 4 are included.
-newData <- only_a_Silberberg[which(days == "2015-11-04"),]
+newData <- only_a_Silberberg[which(days == "2015-11-04"), ]
 # Make a new variable in the data that is only the time of the tweet, not the day
-newData$newtime <- format(as.POSIXct(newData$CreatedTime, format = "%Y-%m-%d %H:%M:%S"), 
-                          format = "%H:%M:%S")
+newData$newtime <- as.numeric(format(as.POSIXct(newData$CreatedTime, format = "%Y-%m-%d %H:%M:%S"),
+  format = "%H"
+))
+
+tweets <- newData[newData$IsRetweet == 0, ]
+retweets <- newData[newData$IsRetweet == 1, ]
+
+countsTweets <- ddply(tweets, .(newtime), nrow)
+countsRetweets <- ddply(retweets, .(newtime), nrow)
+
+pdf("./plots/tweets.pdf")
+
+plot(
+  x = countsRetweets$newtime,
+  y = countsRetweets$V1,
+  type = "l",
+  col = "blue",
+  xlab = "Hour of the Day",
+  main = "Tweets for 'a_silberberg'",
+  ylab = "Number of tweets per hour"
+)
+points(
+  x = countsTweets$newtime,
+  y = countsTweets$V1,
+  type = "l",
+  col = "red"
+)
+legend(1, 11, legend = c("Retweets", "Tweets"), col = c("blue", "red"), lty = 1, cex = 0.8)
+
+dev.off()
 ```
 
