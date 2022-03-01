@@ -12,6 +12,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
 \textbf{Write the R code to answer the following questions. Write the code, and then show what the computer returns when that code is run. Thoroughly comment your solutions.}
@@ -33,7 +34,7 @@ The data is associated with 2020 Democratic primary elections. Polling results f
 \end{itemize}
 
 
-```{r eval=TRUE}
+```{r tidy=TRUE}
 # Remove eval=FALSE to have this code block run.
 
 # Load library dependencies
@@ -49,7 +50,51 @@ primaryPolls<-read_csv(dataURL)
 primaryPolls$start_date<-as.Date(primaryPolls$start_date, "%m/%d/%y")
 ```
 
-  * 1. Find separate data for each state.
+**NOTE 1**: primaryPolls's unit of analysis (i.e., each observation/row) is on the candidate level. Notable variables:
+
+  * **start_date**: Survey's initiation date.
+  
+  * **end_date**: Survey's termination date.
+  
+  * **party**: Political party of candidate (this polling data *does* include some Republican candidates).
+  
+  * **candidate_name**: name of candidate.
+  
+  * **pct**: estimated proportion of the population that supports the candidate.
+
+**STEP 1**: Fix errors in and consolidate the data. 
+
+  * Drop Republican candidates.
+
+```{r tidy=TRUE}
+unique(primaryPolls$party)
+primaryPolls <- primaryPolls[which(primaryPolls$party == "DEM"),]
+unique(primaryPolls$party)
+# Only Democratic candidates remain.
+```
+
+  * Fix Julian Castro's name. I think the accents didn't load into the original dataset, so I don't include the accent.
+```{r tidy=TRUE}
+unique(primaryPolls$candidate_name[primaryPolls$answer == "Castro"])
+sum(is.na(primaryPolls$answer))
+sum(is.na(primaryPolls$candidate_name))
+
+primaryPolls[primaryPolls$answer == "Castro", "candidate_name"] <- "Julian Castro"
+
+unique(primaryPolls$candidate_name[primaryPolls$answer == "Castro"])
+
+# candidate_name now uses all unique values.
+```
+
+  * Ensure that there are a manageable number of Democratic candidates.
+```{r}
+length(unique(primaryPolls$candidate_name))
+# Holy cow! Pollsters really included everyone and their mom in their polls, didn't they?
+# We can't have 59 Democratic candidates on our graphs!
+```
+
+
+**Step 2**: Separate out data for each state.
   
     * New Hampshire.
 ```{r}
