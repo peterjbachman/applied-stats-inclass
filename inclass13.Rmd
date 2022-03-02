@@ -89,7 +89,7 @@ unique(primaryPolls$candidate_name[primaryPolls$answer == "Castro"])
   * Ensure that there are a manageable number of Democratic candidates.
 ```{r}
 length(unique(primaryPolls$candidate_name))
-# Holy cow! Pollsters really included everyone and their mom in their polls, didn't they?
+# Holy cow! Pollsters really ever notable person in these polls.
 # We can't have 59 Democratic candidates on our graphs!
 unique(primaryPolls$candidate_name)
 ```
