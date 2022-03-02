@@ -100,6 +100,9 @@ unique(primaryPolls$candidate_name)
     * New Hampshire.
 ```{r}
 newhampshire <- primaryPolls[which(primaryPolls$state == "New Hampshire"),]
+ggplot(data = newhampshire[which(newhampshire$pct > 8 & newhampshire$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
 ```
 
 
