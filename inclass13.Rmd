@@ -109,7 +109,9 @@ states <- rbind(newhampshire, southcarolina, nevada)
 #This is a graph of each state we chose with the candidates polling percentage over time. We identified canddidates above 8 percent and left out Michelle Obama because she only had one poll at this threshold back in October. 
 ggplot(data = states[which(states$pct > 8 & states$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
   facet_wrap(~state, nrow = 3) +
-  ggtitle("Candidate Polling") +
+  ggtitle("Candidate Polling",
+          subtitle = "https://jmontgomery.github.io/PDS/Datasets/president_primary_polls_feb2020.csv") +
+  labs(color = "Candidate Name") +
   xlab("date") +
   ylab("percent") +
   geom_point() +
