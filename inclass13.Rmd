@@ -110,7 +110,8 @@ states <- rbind(newhampshire, southcarolina, nevada)
 ggplot(data = states[which(states$pct > 8 & states$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
   facet_wrap(~state, nrow = 3) +
   geom_point() +
-  geom_smooth(se = FALSE)
+  geom_smooth(se = FALSE) +
+  theme_minimal()
 ```
 
 
@@ -118,16 +119,19 @@ ggplot(data = states[which(states$pct > 8 & states$candidate_name != "Michelle O
 ```{r}
 ggplot(data = nevada[which(nevada$pct > 8 & nevada$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
   geom_point() +
-  geom_smooth(se = FALSE)
+  geom_smooth(se = FALSE) +
+  theme_minimal()
 
 ggplot(data = southcarolina[which(southcarolina$pct > 8 & southcarolina$candidate_name != "Michelle Obama"),], 
        aes(x = start_date, y = pct,color = candidate_name)) +
   geom_point() +
-  geom_smooth(se = FALSE)
+  geom_smooth(se = FALSE) +
+  theme_minimal()
 
 ggplot(data = newhampshire[which(newhampshire$pct > 8 & newhampshire$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
   geom_point() +
-  geom_smooth(se = FALSE)
+  geom_smooth(se = FALSE) +
+  theme_minimal()
 ```
 
 
