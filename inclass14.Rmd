@@ -25,7 +25,7 @@ You've been hired by a campaign to do some data analysis during the primary stag
 
 You used this same data for the previous in class activity. Your task is to re-organize the \texttt{primaryPolls} data so that there is only one row for each candidate-state dyad. Limit the data down to only the relevant candidates. Once complete, compare the size of this dataset to the original dataset using the \texttt{object\_size} command.
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 # Remove eval=FALSE to have this code block run.
 
 # Load library dependencies
@@ -41,11 +41,25 @@ primaryPolls<-read_csv(dataURL)
 primaryPolls$start_date<-as.Date(primaryPolls$start_date, "%m/%d/%y")
 
 # Your commented solution goes here.
+
 ```
 
+```{r}
+# Excercise from in-class thing
+# - Filter the data so it includes only polls taken in the last two months
+# - Select down to only the start_date, pct, state, and candidate
+# - Create a new variabele that is the proportion of respondents in favor
+# - Find the median level of support for the top 10 candidates by state limited only to candidate/state combinations with at least 5 polls
 
 
+test <- primaryPolls %>%
+  filter(start_date > "2019-12-08") %>%
+  mutate(prop = (pct / 100) * sample_size) %>%
+  select(start_date, pct, state, candidate_name, prop)
 
-
-
+sum_candidates <- test %>%
+  group_by(candidate_name, state) %>%
+  summarise(avg_cand = mean(pct), count = n()) %>%
+  filter(count > 10)
+```
 
