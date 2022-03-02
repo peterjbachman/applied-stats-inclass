@@ -1,6 +1,7 @@
 ---
 title: "Applied Statistical Programming - dplyr and tidyr"
 date: "3/2/2022"
+author: "Amaan, Alex, Patrick, Peter"
 header-includes:
    - \usepackage{amsmath}
    - \usepackage{geometry}
