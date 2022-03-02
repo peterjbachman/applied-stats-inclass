@@ -97,7 +97,7 @@ unique(primaryPolls$candidate_name)
 
 **Step 2**: Separate out data for each state.
   
-    * New Hampshire.
+    * Overall graph.
 ```{r}
 #We partitioned our 3 states 
 newhampshire <- primaryPolls[which(primaryPolls$state == "New Hampshire"),]
@@ -106,37 +106,40 @@ southcarolina <- primaryPolls[which(primaryPolls$state == "South Carolina"),]
 #and created one dataset
 states <- rbind(newhampshire, southcarolina, nevada)
 
-#This is a graph of each state we chose with the candidates polling percentage over time. We identified canddidates above 8 percent and left out Michelle Obama because she only had one poll at this threshold back in October. 
+#This is a graph of each state we chose with the candidates polling percentage over time. We identified candidates above 8 percent and left out Michelle Obama because she only had one poll at this threshold back in October. 
 ggplot(data = states[which(states$pct > 8 & states$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
   facet_wrap(~state, nrow = 3) +
-  ggtitle("Candidate Polling",
-          subtitle = "https://jmontgomery.github.io/PDS/Datasets/president_primary_polls_feb2020.csv") +
+  ggtitle("Candidate Polling") +
   labs(color = "Candidate Name") +
-  xlab("date") +
-  ylab("percent") +
+  xlab("Date") +
+  ylab("Percent") +
   geom_point() +
   geom_smooth(se = FALSE) +
-  theme_minimal()
+  theme_minimal() +
+  labs(caption = "Source: https://jmontgomery.github.io/PDS/Datasets/president_primary_polls_feb2020.csv")
 ```
 
 
-    * Nevada.
+    * State-Level Graphs.
 ```{r}
 ggplot(data = nevada[which(nevada$pct > 8 & nevada$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
   geom_point() +
   geom_smooth(se = FALSE) +
-  theme_minimal()
+  theme_minimal() +
+  labs(caption = "Source: https://jmontgomery.github.io/PDS/Datasets/president_primary_polls_feb2020.csv")
 
 ggplot(data = southcarolina[which(southcarolina$pct > 8 & southcarolina$candidate_name != "Michelle Obama"),], 
        aes(x = start_date, y = pct,color = candidate_name)) +
   geom_point() +
   geom_smooth(se = FALSE) +
-  theme_minimal()
+  theme_minimal() +
+  labs(caption = "Source: https://jmontgomery.github.io/PDS/Datasets/president_primary_polls_feb2020.csv")
 
 ggplot(data = newhampshire[which(newhampshire$pct > 8 & newhampshire$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
   geom_point() +
   geom_smooth(se = FALSE) +
-  theme_minimal()
+  theme_minimal() +
+  labs(caption = "Source: https://jmontgomery.github.io/PDS/Datasets/president_primary_polls_feb2020.csv")
 ```
 
 
