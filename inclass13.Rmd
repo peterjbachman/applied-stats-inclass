@@ -99,8 +99,16 @@ unique(primaryPolls$candidate_name)
   
     * New Hampshire.
 ```{r}
+#We partitioned our 3 states 
 newhampshire <- primaryPolls[which(primaryPolls$state == "New Hampshire"),]
-ggplot(data = newhampshire[which(newhampshire$pct > 8 & newhampshire$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
+nevada <- primaryPolls[which(primaryPolls$state == "Nevada"),]
+southcarolina <- primaryPolls[which(primaryPolls$state == "South Carolina"),]
+#and created one dataset
+states <- rbind(newhampshire, southcarolina, nevada)
+
+#This is a graph of each state we chose with the candidates polling percentage over time. We identified canddidates above 8 percent and left out Michelle Obama because she only had one poll at this threshold back in October. 
+ggplot(data = states[which(states$pct > 8 & states$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
+  facet_wrap(~state, nrow = 3) +
   geom_point() +
   geom_smooth(se = FALSE)
 ```
@@ -108,13 +116,21 @@ ggplot(data = newhampshire[which(newhampshire$pct > 8 & newhampshire$candidate_n
 
     * Nevada.
 ```{r}
-nevada <- primaryPolls[which(primaryPolls$state == "Nevada"),]
+ggplot(data = nevada[which(nevada$pct > 8 & nevada$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+
+ggplot(data = southcarolina[which(southcarolina$pct > 8 & southcarolina$candidate_name != "Michelle Obama"),], 
+       aes(x = start_date, y = pct,color = candidate_name)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+
+ggplot(data = newhampshire[which(newhampshire$pct > 8 & newhampshire$candidate_name != "Michelle Obama"),], aes(x = start_date, y = pct,color = candidate_name)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
 ```
 
 
-    * South Carolina.
-```{r}
-southcarolina <- primaryPolls[which(primaryPolls$state == "South Carolina"),]
-```
+
 
 
