@@ -40,12 +40,26 @@ primaryPolls<-read_csv(dataURL)
 # Format the date
 primaryPolls$start_date<-as.Date(primaryPolls$start_date, "%m/%d/%y")
 
-# Your commented solution goes here.
+#arranging the data by state and then by candidate name
+primaryPolls <- arrange(primaryPolls, state, candidate_name) 
+
+#moving state and candidate name variables to the front of the dataset.
+primaryPolls <- select(primaryPolls, state, candidate_name, pct, everything())
+
+#creating a dataset that is a candidate-state dyad verison of our original primaryPolls dataset
+primaryPolls_CandidateState <- primaryPolls %>% distinct(candidate_name, state, .keep_all = TRUE)
+
+#getting the 5 highest polling candidates for each state
+primaryPolls_CandidateState <- primaryPolls_CandidateState %>% arrange(desc(pct)) %>% group_by(state) %>% slice(1:5)
+
+#comparing the size of our original primaryPolls dataset with our new candidate-dyad, 5 highest candidates dataset. 
+object.size(primaryPolls)
+object.size(primaryPolls_CandidateState)
 
 ```
 
 ```{r}
-# Excercise from in-class thing
+# Excercise from in-class lecture
 # - Filter the data so it includes only polls taken in the last two months
 # - Select down to only the start_date, pct, state, and candidate
 # - Create a new variabele that is the proportion of respondents in favor
