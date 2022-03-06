@@ -97,6 +97,7 @@ sum_candidates <- filter_poll %>%
   mutate(avg_cand = mean(pct), count = n()) %>%
   arrange(desc(avg_cand)) %>%
   # This is a roundabout way to get the top ten.?
-  filter(count > 5 & avg_cand %in% unique(avg_cand)[1:10])
+  filter(count > 5 & avg_cand %in% unique(avg_cand)[1:10]) %>%
+  summarise(Average_candidate = mean(pct), count = n())
 ```
 
