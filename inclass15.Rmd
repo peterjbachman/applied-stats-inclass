@@ -39,5 +39,11 @@ Once you have imported the data, use relational database commands join data as n
 
 
 ```{r}
-# Your code
+library(tidyverse)
+
+# Load datasets
+mayors <- read_csv(file = "https://raw.githubusercontent.com/jmontgomery/jmontgomery.github.io/master/PDS/Datasets/Mayors.csv")
+mentions <- read_csv(file = "https://raw.githubusercontent.com/jmontgomery/jmontgomery.github.io/master/PDS/Datasets/TwitterMentions.csv")
+tweets <- read_csv("Tweets.csv")
+
 ```
