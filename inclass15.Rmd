@@ -46,4 +46,46 @@ mayors <- read_csv(file = "https://raw.githubusercontent.com/jmontgomery/jmontgo
 mentions <- read_csv(file = "https://raw.githubusercontent.com/jmontgomery/jmontgomery.github.io/master/PDS/Datasets/TwitterMentions.csv")
 tweets <- read_csv("Tweets.csv")
 
+# In-class drill 1 & 2
+tweets <- rename(tweets, TwitterHandle = ScreenName)
+left <- tweets %>% 
+  left_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
+            by = "TwitterHandle")
+
+right <- tweets %>% 
+  right_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
+            by = "TwitterHandle")
+
+inner <- tweets %>% 
+  inner_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
+            by = "TwitterHandle")
+
+full <- tweets %>% 
+  full_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
+            by = "TwitterHandle")
+
+# Drill 3
+subsetMayors <- mayors %>%
+   filter(TwitterHandle %in% c("robertgarcialb", "rodhiggins2017"))
+
+subsetTweets <- tweets %>%
+   filter(TwitterHandle %in% c("robertgarcialb", "rodhiggins2017"))
+
+subsetInner <- subsetTweets %>% 
+  inner_join(subsetMayors,
+            by = "TwitterHandle")
+
+# Item 1
+# Create count for times mayors were mentioned
+mentions_count <- mentions %>%
+   group_by(MayorHandle) %>%
+   mutate(TimesMentioned = n()) %>%
+   rename(TwitterHandle = MayorHandle) %>%
+   select(TwitterHandle, TimesMentioned) %>%
+   unique()
+
+mayors_mentions_count <- mayors %>%
+   left_join(select(mentions_count, TwitterHandle, TimesMentioned),
+             by = "TwitterHandle")
+
 ```
