@@ -84,6 +84,16 @@ mentions_count <- mentions %>%
    select(TwitterHandle, TimesMentioned) %>%
    unique()
 
+mayors_tweets <- tweets %>% 
+  group_by(TwitterHandle) %>%
+  mutate(times_tweeted = n()) %>% 
+  select(TwitterHandle, times_tweeted) %>%
+  unique()
+
+mentions <- mentions %>% rename(TwitterHandle = MayorHandle)
+
+mentions <- mentions %>% left_join(mayors_tweets, by = "TwitterHandle")
+
 mayors_mentions_count <- mayors %>%
    left_join(select(mentions_count, TwitterHandle, TimesMentioned),
              by = "TwitterHandle")
