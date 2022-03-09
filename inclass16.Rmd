@@ -23,6 +23,39 @@ below. You may use R, but not any online R documentation. Submit the Rmarkdown
 and the knitted PDF to Canvas. Have one group member submit the activity with
 all group members listed at the top.
 
+```{r}
+library(tidyverse)
+
+# In-Class drill
+tweets <- read_csv("Tweets.csv")
+
+## Filter down to only her tweets
+tweetsKrewson <- tweets %>%
+   filter(ScreenName == "lydakrewson")
+
+## Find mean number of words in tweets
+TextSplit <- str_split(tweetsKrewson$Text, pattern = " ")
+
+mean(sapply(TextSplit, length))
+
+## Get unique words
+tweetsKrewson$Text %>%
+   str_split(pattern = " ") %>%
+   unlist() %>%
+   unique() %>%
+   length()
+
+## Reduce all words to their first 5 characters and compare to previous two
+## things
+TextShorten <- lapply(TextSplit, str_sub, start = 1, end = 5)
+TextShorten %>%
+   unlist() %>%
+   unique() %>%
+   length()
+
+mean(sapply(TextShorten, length))
+```
+
 
 \section*{\texttt{regex} practice}
 
@@ -36,7 +69,10 @@ with the following patterns.
 \end{itemize}
 
 ```{r}
-# Your code
+phone_numbers <- c("1234567890", "123 456 7890", "123-456-7890", "+1 1234567890")
+
+str_detect(phone_numbers, "\\+?\\d\\s?-?\\d\\s?-?\\d")
+\+?\\d\\s?\-?\\d\\s?\-?\d
 ```
 
 \section*{Text-as-Data}
