@@ -39,9 +39,15 @@ TextSplit <- str_split(tweetsKrewson$Text, pattern = " ")
 mean(sapply(TextSplit, length))
 
 ## Get unique words
-tweetsKrewson$Text %>%
+rawText <- tweetsKrewson$Text %>%
    str_split(pattern = " ") %>%
-   unlist() %>%
+   unlist()
+
+# Remove web links
+rawText <- rawText[!str_detect(rawText, "https")]
+
+rawText
+
    unique() %>%
    length()
 
@@ -51,7 +57,7 @@ TextShorten <- lapply(TextSplit, str_sub, start = 1, end = 5)
 TextShorten %>%
    unlist() %>%
    unique() %>%
-   length()
+   length() 
 
 mean(sapply(TextShorten, length))
 ```
