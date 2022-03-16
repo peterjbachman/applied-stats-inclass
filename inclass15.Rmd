@@ -2,11 +2,11 @@
 title: "Applied Statistical Programming - Relational Databases"
 date: "3/7/2022"
 header-includes:
-   - \usepackage{amsmath}
-   - \usepackage{geometry}
-   - \usepackage{hyperref}
-   - \usepackage{setspace}
-   - \usepackage{hyperref}
+  - \usepackage{amsmath}
+  - \usepackage{geometry}
+  - \usepackage{hyperref}
+  - \usepackage{setspace}
+  - \usepackage{hyperref}
 output: pdf_document
 ---
 
@@ -15,8 +15,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 \textbf{Write R code to answer the following questions. Write the code, and then
-        show what the computer returns when that code is run. Thoroughly comment
-        your solutions.}
+    show what the computer returns when that code is run. Thoroughly comment
+    your solutions.}
 
 You have until the beginning of class 3/9 at 10:00am to complete the assignment
 below. You may use R, but not any online R documentation. Submit the Rmarkdown
@@ -31,20 +31,20 @@ combined to answer a set of questions below. The data can be found at the
 following URLs.
 
 \begin{itemize}
-   \item \url{https://github.com/jmontgomery/jmontgomery.github.io/blob/master/PDS/Datasets/Tweets.csv.zip}
-   \item \url{https://raw.githubusercontent.com/jmontgomery/jmontgomery.github.io/master/PDS/Datasets/Mayors.csv}
-   \item \url{https://raw.githubusercontent.com/jmontgomery/jmontgomery.github.io/master/PDS/Datasets/TwitterMentions.csv}
+  \item \url{https://github.com/jmontgomery/jmontgomery.github.io/blob/master/PDS/Datasets/Tweets.csv.zip}
+  \item \url{https://raw.githubusercontent.com/jmontgomery/jmontgomery.github.io/master/PDS/Datasets/Mayors.csv}
+  \item \url{https://raw.githubusercontent.com/jmontgomery/jmontgomery.github.io/master/PDS/Datasets/TwitterMentions.csv}
 \end{itemize}
 
 Once you have imported the data, use relational database commands join data as
 necessary in order to answer the following questions.
 \begin{enumerate}
-   \item For each mayor, calculate the number of times they were mentioned
-   \item Add to the mentions datset the number of times each mayor tweeted.
-   \item Create a combined dataset of all tweets from the tweets and mentions
+  \item For each mayor, calculate the number of times they were mentioned
+  \item Add to the mentions datset the number of times each mayor tweeted.
+  \item Create a combined dataset of all tweets from the tweets and mentions
        data. Subset down to overlapping columns (and rename where needed) to make
        this easy.
-   \item Are there any tweets in the mentions dataset from mayors?
+  \item Are there any tweets in the mentions dataset from mayors?
 \end{enumerate}
 
 
@@ -59,61 +59,83 @@ tweets <- read_csv("Tweets.csv")
 
 # In-class drill 1 & 2 ---------------------------------------------------------
 tweets <- rename(tweets, TwitterHandle = ScreenName)
-left <- tweets %>% 
+left <- tweets %>%
   left_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
-            by = "TwitterHandle")
+    by = "TwitterHandle"
+  )
 
-right <- tweets %>% 
+right <- tweets %>%
   right_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
-            by = "TwitterHandle")
+    by = "TwitterHandle"
+  )
 
-inner <- tweets %>% 
+inner <- tweets %>%
   inner_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
-            by = "TwitterHandle")
+    by = "TwitterHandle"
+  )
 
-full <- tweets %>% 
+full <- tweets %>%
   full_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
-            by = "TwitterHandle")
+    by = "TwitterHandle"
+  )
 
 # Drill 3 ----------------------------------------------------------------------
 subsetMayors <- mayors %>%
-   filter(TwitterHandle %in% c("robertgarcialb", "rodhiggins2017"))
+  filter(TwitterHandle %in% c("robertgarcialb", "rodhiggins2017"))
 
 subsetTweets <- tweets %>%
-   filter(TwitterHandle %in% c("robertgarcialb", "rodhiggins2017"))
+  filter(TwitterHandle %in% c("robertgarcialb", "rodhiggins2017"))
 
-subsetInner <- subsetTweets %>% 
+subsetInner <- subsetTweets %>%
   inner_join(subsetMayors,
-            by = "TwitterHandle")
+    by = "TwitterHandle"
+  )
 
 # Item 1 -----------------------------------------------------------------------
 ## Create count for times mayors were mentioned
 mentions_count <- mentions %>%
-   group_by(MayorHandle) %>%
-   mutate(TimesMentioned = n()) %>%
-   rename(TwitterHandle = MayorHandle) %>%
-   select(TwitterHandle, TimesMentioned) %>%
-   unique()
+  group_by(MayorHandle) %>%
+  mutate(TimesMentioned = n()) %>%
+  rename(TwitterHandle = MayorHandle) %>%
+  select(TwitterHandle, TimesMentioned) %>%
+  unique()
 
 mentions <- mentions %>% rename(TwitterHandle = MayorHandle)
 
 mayors_mentions_count <- mayors %>%
-   left_join(select(mentions_count, TwitterHandle, TimesMentioned),
-             by = "TwitterHandle")
+  left_join(select(mentions_count, TwitterHandle, TimesMentioned),
+    by = "TwitterHandle"
+  )
 
 # Item 2 -----------------------------------------------------------------------
-mayors_tweets <- tweets %>% 
+mayors_tweets <- tweets %>%
   group_by(TwitterHandle) %>%
-  mutate(times_tweeted = n()) %>% 
+  mutate(times_tweeted = n()) %>%
   select(TwitterHandle, times_tweeted) %>%
   unique()
 
 mentions <- mentions %>% left_join(mayors_tweets, by = "TwitterHandle")
 
 # Item 3 -----------------------------------------------------------------------
+## Columns to remove:
+## - ScreenName
+## - Column 1 from each one?
 
+tweets_subset <- tweets %>%
+  select(-1)
+
+mentions_subset <- mentions %>%
+  select(-c(1, 3, 17))
+
+## DON'T RUN. It's currently not working.
+# tweets_mentions <- tweets_subset %>%
+#   left_join(mentions_subset, by = "TwitterHandle")
 
 # Item 4------------------------------------------------------------------------
+## Is this an inner join?
+inner_tweets <- tweets_subset %>%
+  inner_join(mentions_subset)
 
+nrow(inner_tweets)
 
 ```
