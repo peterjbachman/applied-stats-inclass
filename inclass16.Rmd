@@ -46,11 +46,6 @@ rawText <- tweetsKrewson$Text %>%
 # Remove web links
 rawText <- rawText[!str_detect(rawText, "https")]
 
-rawText
-
-   unique() %>%
-   length()
-
 ## Reduce all words to their first 5 characters and compare to previous two
 ## things
 TextShorten <- lapply(TextSplit, str_sub, start = 1, end = 5)
@@ -78,7 +73,6 @@ with the following patterns.
 phone_numbers <- c("1234567890", "123 456 7890", "123-456-7890", "+1 1234567890")
 
 str_detect(phone_numbers, "\\+?\\d\\s?-?\\d\\s?-?\\d")
-\+?\\d\\s?\-?\\d\\s?\-?\d
 ```
 
 \section*{Text-as-Data}
@@ -102,5 +96,17 @@ and (2). Be sure to properly label your figures.
 
 
 ```{r}
-# Your code
+
+## Regex explanation:
+## - polic(?!.*y|.*ies): Looks for things that start with polic- but does not
+##   count policy or policies
+## - \\bcop(s?)(?!a|ied|iar): Looks for cop or cops, but excludes other words
+##   that start with cop-
+police_tweets <- tweets %>%
+  filter(str_detect(Text, pattern = "polic(?!.*y|.*ies)|\\bcop(s?)(?!a|ied|iar)"))
+
+## Regex explanation:
+## - Black Lives Matter|BLM: Captures either "Black Lives Matter" or "BLM"
+blm_tweets <- tweets %>%
+  filter(str_detect(Text, pattern = "Black Lives Matter|BLM"))
 ```
