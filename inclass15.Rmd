@@ -1,6 +1,7 @@
 ---
 title: "Applied Statistical Programming - Relational Databases"
 date: "3/7/2022"
+author: Peter Bachman, Patrick Edwards, Amaan Charaniya, Alex Avery.
 header-includes:
   - \usepackage{amsmath}
   - \usepackage{geometry}
@@ -61,10 +62,12 @@ tweets <- read_csv("Tweets.csv")
 
 **Preliminary Data Analysis**:
 ```{r tidy = TRUE}
-# (i) Rename first column of 'tweets' dataset to 'id':
-tweets <- rename(tweets, id = ...1)
+# (i). Rename first column of 'tweets' dataset to 'tweetsdata_id':
+tweets <- rename(tweets, tweetsdata_id = ...1)
+# (ii). Rename first column of 'mentions' dataset to 'mentionsdata_id'
+mentions <- rename(mentions, mentionsdata_id = ...1)
 
-# (i) Ensure that each dataset has a matching identifier (or 'key'):
+# (iii). Ensure that each dataset has a matching identifier (or 'key'):
 colnames(mayors) #TwitterHandle
 colnames(mentions) #MayorHandle
 mentions <- rename(mentions, TwitterHandle = MayorHandle)
@@ -72,7 +75,7 @@ colnames(tweets) #ScreenName
 tweets <- rename(tweets, TwitterHandle = ScreenName)
 # FINISHED: all datasets should have the same matching identifier.
 
-# (ii). Ensure that each dataset has a UNIQUE matching identifier:
+# (iv). Ensure that each dataset has a UNIQUE matching identifier:
 mayors %>% 
   count(TwitterHandle) %>%
   filter(n > 1)
@@ -109,20 +112,20 @@ tweets %>%
 #   Notice that neither tweet has TweetID = 413450477196816384. Correct the TweetIDs:
 
 tweets %>%
-  filter(id == 472216) # First tweet
+  filter(tweetsdata_id == 472216) # First tweet
 tweets <- tweets %>%
   mutate(TweetID = format(TweetID, scientific = FALSE)) %>%
-  mutate(TweetID = replace(TweetID, id == 472216, "413450477196816386")) %>%
+  mutate(TweetID = replace(TweetID, tweetsdata_id == 472216, "413450477196816386")) %>%
   mutate(TweetID = format(TweetID, scientific = TRUE))
 
 tweets %>%
   filter(TweetID == 413450477196816384)
 # Second tweet's ID: 472217.
 tweets %>%
-  filter(id == 472217) # Second tweet
+  filter(tweetsdata_id == 472217) # Second tweet
 tweets <- tweets %>%
   mutate(TweetID = format(TweetID, scientific = FALSE)) %>%
-  mutate(TweetID = replace(TweetID, id == 472216, "413450477196816385")) %>%
+  mutate(TweetID = replace(TweetID, tweetsdata_id == 472216, "413450477196816385")) %>%
   mutate(TweetID = format(TweetID, scientific = TRUE))
 
 tweets %>% 
@@ -223,6 +226,14 @@ fullsubset <- subsetTweets %>%
 # OVERALL EXPLANATION: all joins result in duplicate copies of each tweet by these mayors. This is because we lack a unique matching 'key' for these mayors for which we can match across datasets.
 ```
 
+
+**Housingkeeping**: remove irrelevant datasets.
+```{r}
+ls()
+rm(full, inner, left, rightsubset, subsetTweets, fullsubset, innersubset, leftsubset, right, subsetMayors)
+```
+
+
 **In-Class Assignment**:
 ```{r tidy = TRUE}
 # Item 1 -----------------------------------------------------------------------
@@ -233,40 +244,178 @@ mentions_count <- mentions %>%
   select(TwitterHandle, TimesMentioned) %>%
   unique()
 
+## Add mentions_count to dataset of mayors by TwitterHandle
 mayors_mentions_count <- mayors %>%
   left_join(select(mentions_count, TwitterHandle, TimesMentioned),
     by = "TwitterHandle"
   )
 
 # Item 2 -----------------------------------------------------------------------
+
+# Count the number of times each mayor tweeted.
 mayors_tweets <- tweets %>%
   group_by(TwitterHandle) %>%
   mutate(times_tweeted = n()) %>%
   select(TwitterHandle, times_tweeted) %>%
   unique()
 
+# Add 'mayors_tweets' to 'mentions' dataset.
+
 mentions <- mentions %>% left_join(mayors_tweets, by = "TwitterHandle")
 
+## NOTE: this is a one-to-many join. The dataset 'mayors_tweets' -- with one observation per mayor -- is joined to the dataset 'mentions' -- with multiple observations per mayor.
+
 # Item 3 -----------------------------------------------------------------------
+# STEP (i). Fixed class of 'TweetID' in datasets.
+##     I convert the 'TweetID'column in BOTH datasets to character for ease of joining.
+class(tweets$TweetID) # 'character' class.
+class(mentions$TweetID) # 'numeric' instead of 'character' class.
+mentions <- mentions %>%
+  mutate(TweetID = format(TweetID, scientific = FALSE)) # Convert to 'character' class and remove scientific notation.
+class(tweets$TweetID)
+class(mentions$TweetID) # Both columns have matching classes now.
+
+# STEP (ii). Determine overlapping & unique columns:
+colnames(tweets)
+colnames(mentions)
+
+# Overlapping columns:
+## TweetID, TwitterHandle, Text, CreatedTime, Favorited, FavoritesCount, IsRetweet, RetweetCount, Retweeted, ReplyToSN, ReplyToSID, ReplyToUID, Truncated, StatusSource, Longitude, Latitude.  
+
+# Columns unique to 'tweets' dataset:
+## tweetsdata_id
+
+# Columns unique to 'mentions' dataset:
+## ScreenName, mentionsdata_id
+
+
+# STEP (iii). Create dummy variables.
+tweets <- tweets %>%
+  mutate(tweetsdata_origin = 1)
+mentions <- mentions %>%
+  mutate(mentionsdata_origin = 1)
+## NOTE: these dummy variables will be useful in part #4 of this problem set - Patrick.
+### Tweets present in both datasets will have both columns 'tweetsdata_origin == 1' & 'mentionsdata_origin = 1' - Patrick.
+
+
+# STEP (iv). Remove irrelevant variables
+
 ## Columns to remove:
-## - ScreenName
-## - Column 1 from each one?
+## - 'ScreenName' from 'mentions' dataset.
+## - 'times_tweeted' from 'mentions' dataset.
+## - Column 1 from each one? - Peter.
+###  Peter is referring to the column I renamed 'mentionsdata_id' and 'tweetsdata_id' in the 'mentions' and 'tweets' dataset. 
+###  I think we should remove these and replace them with a dummy variable signifying each dataset these tweets came from. - Patrick.
 
+## Remove 'tweetsdata_id' column from 'tweets' dataset:
 tweets_subset <- tweets %>%
-  select(-1)
+  select(-tweetsdata_id)
 
+## Remove 'mentionsdata_id', 'ScreenName', and 'times_tweeted' columns from 'mentions' dataset:
+colnames(mentions)
 mentions_subset <- mentions %>%
-  select(-c(1, 3, 17))
+  select(-mentionsdata_id) %>%
+  select(-ScreenName) %>%
+  select(-times_tweeted)
 
-## DON'T RUN. It's currently not working.
+
+
+# STEP (v). GAMEPLAN: we should merge by 'TweetID' column. 
+## Recall that, in in step (iv) of the **Preliminary Analysis** section above, we already checked for the uniqueness of the 'TweetID' variable in each dataset.
+
+
+# STEP (vi). Merge the sub-datasets 'tweets_subset' and 'mentions_subset' together:
+
+# Make sure both datasets are arranged/grouped by 'TweetID':
+tweets_subset <- tweets_subset %>%
+  arrange(TweetID)
+
+mentions_subset <- mentions_subset %>%
+  arrange(TweetID)
+
+## DON'T RUN. It's currently not working - Peter.
 # tweets_mentions <- tweets_subset %>%
 #   left_join(mentions_subset, by = "TwitterHandle")
 
+# What if we join by 'TweetID' instead of 'TwitterHandle'? - Patrick.
+## I believe some tweets are included in both datasets because mayors often mention themselves in their tweets. - Patrick.
+## Joining by 'TweetID', therefore, should allow identical observations to merge. - Patrick.
+### Include all overlapping columns common to both datasets mentioned in STEP (ii) - Patrick.
+
+# NOTE: we should do a 'full_join'. This many-to-many joining will keep observations from all datasets while also merging matching tweets.
+
+tweets_mentions <- full_join(tweets_subset,
+                             mentions_subset, 
+                             by = c("TweetID",
+                                    "TwitterHandle", 
+                                    "Text", 
+                                    "CreatedTime", 
+                                    "Favorited",
+                                    "FavoritesCount",
+                                    "IsRetweet",
+                                    "RetweetCount",
+                                    "Retweeted", 
+                                    "ReplyToSN", 
+                                    "ReplyToSID", 
+                                    "ReplyToUID", 
+                                    "Truncated",
+                                    "StatusSource",
+                                    "Longitude", 
+                                    "Latitude"
+                                    )
+                             )
+
+
 # Item 4------------------------------------------------------------------------
-## Is this an inner join?
-inner_tweets <- tweets_subset %>%
-  inner_join(mentions_subset)
+## Is this an inner join? - Peter.
+## inner_tweets <- tweets_subset %>%
+##  inner_join(mentions_subset)
 
-nrow(inner_tweets)
+## nrow(inner_tweets)
 
+# This is where the dummy variables I created in part #3, STEP (iii) come in handy - Patrick.
+
+# STEP (i): Replace NAs in each dummy variable with zero.
+tweets_mentions <- tweets_mentions %>%
+  mutate(mentionsdata_origin = replace(mentionsdata_origin,
+                                       is.na(mentionsdata_origin),0)) %>%
+  mutate(tweetsdata_origin = replace(tweetsdata_origin,
+                                       is.na(tweetsdata_origin),0))
+
+# STEP (ii): Create dummy variable for observations where 'tweetsdata_origin == 1' & 'mentionsdata_origin = 1':
+tweets_mentions <- tweets_mentions %>%
+  mutate(matched_tweets = NA) %>%
+  mutate(matched_tweets = replace(matched_tweets, 
+                                  tweetsdata_origin == 1 & mentionsdata_origin == 1,
+                                  1)) %>%
+  mutate(matched_tweets = replace(matched_tweets, 
+                                  tweetsdata_origin == 0 | mentionsdata_origin == 0,
+                                  0))
+
+# STEP (iii): Check that (a) the 'matched_tweets' column takes on a value for EVERY observation.
+#tweets_mentions <- ungroup(tweets_mentions, TweetID)
+
+tweets_mentions %>%
+  summarise(matched_tweets, tot_NAs = sum(is.na(matched_tweets)))
+# No NAs.
+
+total_tweets_num <- tweets_mentions %>%
+  summarize(total_tweets = dim(tweets_mentions)[[1]])
+total_tweets_num
+# 660,562 total tweets in the combined dataset.
+
+matched_tweets_num <- tweets_mentions %>%
+  summarize(total_matched_tweets = sum(matched_tweets))
+matched_tweets_num
+# 5,824 tweets that appears in both datasets (i.e., where 'matched_tweets == 1) out of 660,562 total tweets.
+
+unmatched_tweets_num <- tweets_mentions %>%
+  summarize(total_unmatched_tweets = sum(matched_tweets == 0))
+unmatched_tweets_num
+# 654,738 tweets that appear in one of the 'tweets' or 'mentions' datasets but not both.
+
+matched_tweets_num[1,1] + unmatched_tweets_num[1,1] - total_tweets_num[1,1]
+# Therefore, no tweets fall outside of the three categories.
+
+# ANSWER: there are 5,824 tweets in the 'mentions' dataset from mayors.
 ```
