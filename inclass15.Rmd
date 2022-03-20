@@ -48,27 +48,125 @@ necessary in order to answer the following questions.
 \end{enumerate}
 
 
-
-```{r}
+**Libraries; Load Data**:
+```{r tidy = TRUE}
 library(tidyverse)
+library(dplyr)
 
 # Load datasets
 mayors <- read_csv(file = "https://raw.githubusercontent.com/jmontgomery/jmontgomery.github.io/master/PDS/Datasets/Mayors.csv")
 mentions <- read_csv(file = "https://raw.githubusercontent.com/jmontgomery/jmontgomery.github.io/master/PDS/Datasets/TwitterMentions.csv")
 tweets <- read_csv("Tweets.csv")
+```
 
-# In-class drill 1 & 2 ---------------------------------------------------------
+**Preliminary Data Analysis**:
+```{r tidy = TRUE}
+# (i) Rename first column of 'tweets' dataset to 'id':
+tweets <- rename(tweets, id = ...1)
+
+# (i) Ensure that each dataset has a matching identifier (or 'key'):
+colnames(mayors) #TwitterHandle
+colnames(mentions) #MayorHandle
+mentions <- rename(mentions, TwitterHandle = MayorHandle)
+colnames(tweets) #ScreenName
 tweets <- rename(tweets, TwitterHandle = ScreenName)
+# FINISHED: all datasets should have the same matching identifier.
+
+# (ii). Ensure that each dataset has a UNIQUE matching identifier:
+mayors %>% 
+  count(TwitterHandle) %>%
+  filter(n > 1)
+#   Two duplicates: 'robertgarcialb' and 'rodhiggins2017' have two observations each.
+#   Addressed in Drill #3.
+
+mentions %>% 
+  count(TweetID) %>%
+  filter(n > 1)
+#   No duplicates.
+
+tweets %>% 
+  count(TweetID) %>%
+  filter(n > 1)
+#   Two duplicates.
+vec <- tweets %>% 
+  count(TweetID) %>%
+  filter(n > 1) %>%
+  pull(TweetID)
+vec
+format(vec, scientific = FALSE)
+rm(vec)
+# Two duplicates: 
+#   "413450477196816384" for ScreenName 'PATownhall'.
+#   "777752770510290944" for ScreenName '	derek_armstead'.
+
+# Investigate tweet "413450477196816384" for ScreenName 'PATownhall'.
+tweets %>% 
+  mutate(TweetID = format(TweetID, scientific = FALSE)) %>%
+  filter(TweetID == "413450477196816384")
+# Represents these two tweets:
+#   https://twitter.com/PATownhall/status/413450477196816386
+#   https://twitter.com/PATownhall/status/413450477196816385
+#   Notice that neither tweet has TweetID = 413450477196816384. Correct the TweetIDs:
+
+tweets %>%
+  filter(id == 472216) # First tweet
+tweets <- tweets %>%
+  mutate(TweetID = format(TweetID, scientific = FALSE)) %>%
+  mutate(TweetID = replace(TweetID, id == 472216, "413450477196816386")) %>%
+  mutate(TweetID = format(TweetID, scientific = TRUE))
+
+tweets %>%
+  filter(TweetID == 413450477196816384)
+# Second tweet's ID: 472217.
+tweets %>%
+  filter(id == 472217) # Second tweet
+tweets <- tweets %>%
+  mutate(TweetID = format(TweetID, scientific = FALSE)) %>%
+  mutate(TweetID = replace(TweetID, id == 472216, "413450477196816385")) %>%
+  mutate(TweetID = format(TweetID, scientific = TRUE))
+
+tweets %>% 
+  count(TweetID) %>%
+  filter(n > 1)
+
+# Check last duplicate:
+#   "777752770510290944" for ScreenName 'derek_armstead'
+
+tweets %>%
+  mutate(count = n()) %>%
+  filter(TweetID == 777752770510290944)
+#   These tweets do not exist on Twitter. I'm going to remove them.
+dim(tweets)
+tweets <- tweets %>%
+  filter(TweetID != 777752770510290944)
+dim(tweets)
+
+tweets %>% 
+  count(TweetID) %>%
+  filter(n > 1)
+
+# No remaining duplicates in tweets dataset.
+
+```
+
+
+
+**# In-class drill 1 \& 2**:
+```{r tidy = TRUE}
+
+# Left join 3 variables (FacebookLink, TwitterLink, GenderFemale) into `tweets` dataset by `TwitterHandle` unique identifier:
 left <- tweets %>%
   left_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
     by = "TwitterHandle"
   )
 
+# Right join:
 right <- tweets %>%
   right_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
     by = "TwitterHandle"
   )
 
+# Inner join (matches only those observations for which the linking variable appears on both tables):
 inner <- tweets %>%
   inner_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
     by = "TwitterHandle"
@@ -78,8 +176,10 @@ full <- tweets %>%
   full_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
     by = "TwitterHandle"
   )
+```
 
-# Drill 3 ----------------------------------------------------------------------
+**Drill 3**:
+```{r tidy = TRUE}
 subsetMayors <- mayors %>%
   filter(TwitterHandle %in% c("robertgarcialb", "rodhiggins2017"))
 
@@ -90,17 +190,17 @@ subsetInner <- subsetTweets %>%
   inner_join(subsetMayors,
     by = "TwitterHandle"
   )
+```
 
+**In-Class Assignment**:
+```{r tidy = TRUE}
 # Item 1 -----------------------------------------------------------------------
 ## Create count for times mayors were mentioned
 mentions_count <- mentions %>%
-  group_by(MayorHandle) %>%
+  group_by(TwitterHandle) %>%
   mutate(TimesMentioned = n()) %>%
-  rename(TwitterHandle = MayorHandle) %>%
   select(TwitterHandle, TimesMentioned) %>%
   unique()
-
-mentions <- mentions %>% rename(TwitterHandle = MayorHandle)
 
 mayors_mentions_count <- mayors %>%
   left_join(select(mentions_count, TwitterHandle, TimesMentioned),
