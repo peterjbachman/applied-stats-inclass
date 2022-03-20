@@ -172,6 +172,7 @@ inner <- tweets %>%
     by = "TwitterHandle"
   )
 
+#Full join (keeps all data):
 full <- tweets %>%
   full_join(select(mayors, TwitterHandle, FacebookLink, TwitterLink, GenderFemale),
     by = "TwitterHandle"
@@ -180,16 +181,46 @@ full <- tweets %>%
 
 **Drill 3**:
 ```{r tidy = TRUE}
+#  (i). dataframes to only the duplicate mayors:
 subsetMayors <- mayors %>%
   filter(TwitterHandle %in% c("robertgarcialb", "rodhiggins2017"))
 
 subsetTweets <- tweets %>%
   filter(TwitterHandle %in% c("robertgarcialb", "rodhiggins2017"))
 
-subsetInner <- subsetTweets %>%
+
+# (ii). Repeat each join from Drill #2. Explain what happens due to the duplication:
+
+# Left join:
+leftsubset <- subsetTweets %>%
+  left_join(subsetMayors,
+    by = "TwitterHandle"
+  )
+# EXPLANATION: there are two observations for each tweet. In other words, each of these mayor's tweets are duplicated.
+
+# Right join:
+rightsubset <- subsetTweets %>%
+  right_join(subsetMayors,
+    by = "TwitterHandle"
+  )
+# EXPLANATION: same as for the left_join of each subset.
+
+# Inner join:
+innersubset <- subsetTweets %>%
   inner_join(subsetMayors,
     by = "TwitterHandle"
   )
+innersubset <- arrange(innersubset, TweetID)
+# EXPLANATION: same as for left_join and right_join above.
+
+#Full join:
+fullsubset <- subsetTweets %>%
+  full_join(subsetMayors,
+    by = "TwitterHandle"
+  )
+# EXPLANATION: same as for the three joins above.
+
+# OVERALL EXPLANATION: all joins result in duplicate copies of each tweet by these mayors. This is because we lack a unique matching 'key' for these mayors for which we can match across datasets.
 ```
 
 **In-Class Assignment**:
