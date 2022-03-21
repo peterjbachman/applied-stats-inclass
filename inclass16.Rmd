@@ -1,6 +1,7 @@
 ---
 title: "Applied Statistical Programming - Text"
 date: "3/9/2022"
+author: "Amaan, Alex, Patrick, Peter"
 header-includes:
    - \usepackage{amsmath}
    - \usepackage{geometry}
@@ -117,6 +118,7 @@ mayor_tweets <- tweets %>%
   select(c("ScreenName", "blm_count", "police_count")) %>%
   unique()
 
+# Frequency Plots
 ggplot(mayor_tweets, aes(x = blm_count)) +
   geom_freqpoly() +
   labs(
