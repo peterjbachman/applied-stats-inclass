@@ -96,17 +96,40 @@ and (2). Be sure to properly label your figures.
 
 
 ```{r}
-
 ## Regex explanation:
 ## - polic(?!.*y|.*ies): Looks for things that start with polic- but does not
 ##   count policy or policies
 ## - \\bcop(s?)(?!a|ied|iar): Looks for cop or cops, but excludes other words
 ##   that start with cop-
-police_tweets <- tweets %>%
-  filter(str_detect(Text, pattern = "polic(?!.*y|.*ies)|\\bcop(s?)(?!a|ied|iar)"))
+tweets$police_tweet <- str_detect(tweets$Text, pattern = "polic(?!.*y|.*ies)|\\bcop(s?)(?!a|ied|iar)")
 
 ## Regex explanation:
 ## - Black Lives Matter|BLM: Captures either "Black Lives Matter" or "BLM"
-blm_tweets <- tweets %>%
-  filter(str_detect(Text, pattern = "Black Lives Matter|BLM"))
+tweets$blm_tweet <- str_detect(tweets$Text, pattern = "Black Lives Matter|BLM")
+
+## Count tweets by mayor
+mayor_tweets <- tweets %>%
+  group_by(ScreenName) %>%
+  mutate(
+    blm_count = sum(blm_tweet),
+    police_count = sum(police_tweet)
+  ) %>%
+  select(c("ScreenName", "blm_count", "police_count")) %>%
+  unique()
+
+ggplot(mayor_tweets, aes(x = blm_count)) +
+  geom_freqpoly() +
+  labs(
+    title = "Frequency Plot of Mayors Mentioning Black Lives Matter",
+    x = "Number of Tweets mentioning BLM",
+    y = "Number of Mayors"
+  )
+
+ggplot(mayor_tweets, aes(x = police_count)) +
+  geom_freqpoly() +
+  labs(
+    title = "Frequency Plot of Mayors Mentioning Policing",
+    x = "Number of Tweets mentioning Policing",
+    y = "Number of Mayors"
+  )
 ```
