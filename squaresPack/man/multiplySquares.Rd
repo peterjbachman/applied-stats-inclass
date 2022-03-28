@@ -1,14 +1,14 @@
-\name{subtractSquares}
-\alias{subtractSquares}
+\name{multiplySquares}
+\alias{multiplySquares}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Adding Squares
+Multiplying Squares
 }
 \description{
-Finds the difference of two squared values
+Finds the product of two squared values
 }
 \usage{
-subtractSquares(x, y)
+multiplySquares(x, y)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -61,3 +61,4 @@ function (x, y)
 % \concept{ ~cpt1 }
 % \concept{ ~cpt2 }
 % Use only one concept per line.
+
