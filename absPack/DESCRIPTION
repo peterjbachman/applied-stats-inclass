@@ -1,9 +1,0 @@
-Package: absPack
-Type: Package
-Title: Absolute Values Package
-Version: 1.0
-Date: 2022-03-23
-Author: Peter, Alex, Patrick, Amaan
-Maintainer: any of the above
-Description: Finds the sum and difference of two absolute values 
-License: 

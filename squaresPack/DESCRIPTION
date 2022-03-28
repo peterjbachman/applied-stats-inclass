@@ -1,9 +1,0 @@
-Package: squaresPack
-Type: Package
-Title: Adding, subtracting, and multiplying squares
-Version: 1.0
-Date: 2022-03-23
-Author: Peter, Alex, Patrick, Amaan
-Maintainer: any of the above
-Description: Find sum, difference, or product of squared values. 
-License: 
