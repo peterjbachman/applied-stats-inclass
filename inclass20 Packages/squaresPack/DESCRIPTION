@@ -1,0 +1,16 @@
+Package: squaresPack
+Title: Squares Package
+Version: 0.1
+Authors@R: 
+Author: RTM
+Maintainer: rtm <rtm@email.edu>
+Description: Test package for class
+Depends:
+    R (>= 3.0.0)
+License: MIT + file LICENSE
+Suggests:
+    devtools
+Collate:
+    'addSquares.R'
+    'subtractSquares.R'
+RoxygenNote: 7.1.2
