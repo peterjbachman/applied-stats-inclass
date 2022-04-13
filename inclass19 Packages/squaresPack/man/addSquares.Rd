@@ -14,8 +14,8 @@ addSquares(x, y)
 \value{
 A list with the elements
  \item{squares}{The sum of the squared values}
- \item{x}{The first object input} 
- \item{y}{The second object input}
+ \item{x}{The first object numeric}
+ \item{y}{The second object numeric}
 }
 \description{
 Finds the squared sum of numbers
@@ -25,8 +25,8 @@ This is a very simple function
 }
 \examples{
 
-myX <- c(20, 3) 
-myY <- c(-2, 4.1) 
+myX <- c(20, 3)
+myY <- c(-2, 4.1)
 addSquares(myX, myY)
 }
 \seealso{

@@ -2,7 +2,7 @@
 ## Load libraries and set working directory
 library(devtools)
 library(roxygen2)
-setwd() #This will need to be changed to match your directory
+setwd("./inclass19 Packages") #This will need to be changed to match your directory
 
 ## This is run once when the package strcuture is first created
 

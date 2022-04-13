@@ -13,4 +13,4 @@ Suggests:
 Collate:
     'addSquares.R'
     'subtractSquares.R'
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.2
