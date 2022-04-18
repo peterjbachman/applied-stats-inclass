@@ -82,7 +82,7 @@ Complete the preceding tasks in \texttt{R} alone.
 
 # **ANSWERS**: R Section.
 
-**FIRST**: find test data to use on our model.
+## **FIRST**: find test data to use on our model.
 
   * we use the Expectation-Maximization (EM) algorithm on datasets that combine multiple linear models. In this case, we combine different forecasts of US presidential elections using EBMA.
 
@@ -110,14 +110,16 @@ library(EBMAforecast)
 data("presidentialForecast")
 #?presidentialForecast
 
-## OUTCOME VARIABLE: incumbent-party vote share in each presidential election.
-
 df <- presidentialForecast
+
+## OUTCOME VARIABLE: incumbent-party vote share in each presidential election. In this dataset, the actual outcome is the column `Actual`.
+y <- df$Actual
 ```
 
-**SECOND**: for the remaining R code, let's first develop code for each of the steps referenced above before properly structuring them in a for-loop.
+## **SECOND**: implement steps 1-3 above.
+For the remaining R code, let's first develop code for each of the steps referenced above before properly structuring them in a for-loop.
 
-1. **Start with the assumption that all models are weighted equally**.
+### 1. **Start with the assumption that all models are weighted equally**.
 
 **NOTE**: recall from Montgomery, Hollenbach, and Ward (2012) that the $w_k \in [0,1]$'s are model probabilities associated with each component model's predictive performance.
 In other words, the $w_k \in [0,1]$'s are weights associated each each model such that $\sum_{k=1}^K w_k = 1$.
@@ -138,19 +140,47 @@ w_hat <- replicate(K,1/K)
 ## COMPLETE!
 ```
 
-2. **Calculate $\hat{z}_k^{(j+1)t}$ for each model for each election**.
+### 2. **Calculate $\hat{z}_k^{(j+1)t}$ for each model for each election**.
+
+**NOTE**: the function $\hat{z}_k^{(j+1)t} = \frac{\hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)}{\sum\limits^N_{k=1} \hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)}$ is complex, containing several unexplained terms. Let's consider each of these terms:
+
+  * Recall from above that `j` represents the prior iteration of the EM algorithm, so the EM algorithm is recursive. 
+  
+  * Also recall from above that $\hat{z}_k^t$ is the probability that observation `t`  (i.e., a particular presidential election; one row in the test dataset) was best predicted by model `k` (i.e., one column in the test dataset).
+  
+  * Also recall from above that $\hat{w}_k^{(j)}$ is the probability weights for each model `k`. We assume that all $\hat{w}_k^{(j)}$'s in the first iteration.
+  
+  * $y^t$ is the *actual* election result of presidential election `t` (i.e., row `t`'s entry of column `Actual` in the test dataset).
+  
+  * $f_k^t$ is model `k`'s *predicted* election result for presidential election `t` (i.e., row `t`'s entry of column associated with model `k`).
+  
+  * $N(y^t \vert f_k^t, 1)$, then, is the probability that model `k` found predicted outcome $f_k^t$ for presidential election `t` given that the sample distribution is normally distributed around the actual outcome $y^t$ with st. dev. $\sigma^2 = 1$ Generate $N(y^t \vert f_k^t, 1)$ using `norm(y, ftk, 1)` where `y` $=y^t$ and `ftk` $=f_k^t$.
+  
+  * Finally, note that the outcome of this step will be a vector because the numerator $\hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)$ is a vector of `K` elements for EACH model's `w_hat`, while the denominator $\sum\limits^N_{k=1} \hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)$ is a scalar that's the sum of the numerator for each model `k`.
+  
+With this knowledge in mind, let's create code that estimates $\hat{z}_k^{(j+1)t}$:
+  
+```{r eval = FALSE}
+## NOTE: `y = df$Actual`.
+
+## REMINDER 1: `k` denotes the current model (column `k` of `K`).
+
+## REMINDER 2: `t` denotes the current prior presidential election (row `t` of `T`).
+
+## REMINDER 3: `w_hat` is a vector of `K` elements.
+
+
+w_hat2 <- (w_hat * dnorm(y[t], df[t,k], 1)/(sum(w_hat * dnorm(y[t], df[t,k], 1)))
+```
+
+### 3. **Calculate $\hat{w}_k^{(j+1)}$ for each model**.
 
 ```{r}
 
 ```
 
-3. **Calculate $\hat{w}_k^{(j+1)}$ for each model**.
-
-```{r}
-
-```
-
-**THIRD**: perform step (4) above by creating a for-loop that repeats steps 2-3 twenty times.
+## **THIRD**: perform step (4). 
+perform step (4) above by creating a for-loop that repeats steps 2-3 twenty times.
 
 ```{r}
 
