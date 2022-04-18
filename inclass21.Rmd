@@ -81,7 +81,7 @@ Complete the preceding tasks in \texttt{R} alone.
 
 # **ANSWERS**: R Section.
 
-**FIRST**, find test data to use on our model.
+**FIRST**: find test data to use on our model.
 
   * we use the Expectation-Maximization (EM) algorithm on datasets that combine multiple linear models. In this case, we combine different forecasts of US presidential elections using EBMA.
 
@@ -105,6 +105,34 @@ library(EBMAforecast)
 ## Load `presidentialForecast` data from `EBMAforecast` package:
 data("presidentialForecast")
 ```
+
+**SECOND**: for the remaining R code, let's first develop code for each of the steps referenced above before properly structuring them in a for-loop.
+
+1. Start with the assumption that all models are weighted equally.
+
+```{r}
+
+```
+
+2. Calculate $\hat{z}_k^{(j+1)t}$ for each model for each election.
+
+```{r}
+
+```
+
+3. Calculate $\hat{w}_k^{(j+1)}$ for each model.
+
+```{r}
+
+```
+
+**THIRD**: perform step (4) above by creating a for-loop that repeats steps 2-3 twenty times.
+
+```{r}
+
+```
+
+
 
 
 
