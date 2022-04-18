@@ -79,6 +79,35 @@ The estimation procedure is as follows:
 ```
 Complete the preceding tasks in \texttt{R} alone.
 
+# **ANSWERS**: R Section.
+
+**FIRST**, find test data to use on our model.
+
+  * we use the Expectation-Maximization (EM) algorithm on datasets that combine multiple linear models. In this case, we combine different forecasts of US presidential elections using EBMA.
+
+  * To learn more about EBMA forecasts and (hopefully) find some toy data to use with our functions, let's install and investigate the `EBMAforecast` package.
+
+```{r}
+## Install package:
+#install.packages("EBMAforecast")
+library(EBMAforecast)
+
+## Read documentation:
+#?EBMAforecast
+
+## Find data used in demo(PresForecast):
+#demo(presForecast)
+```
+
+  * Let's load the `presidentialForecast` data from the `EBMAforecast` package:
+
+```{r}
+## Load `presidentialForecast` data from `EBMAforecast` package:
+data("presidentialForecast")
+```
+
+
+
 ```{r rVersion}
 
 # Eventually wrap everything in a loop, or apply function?
