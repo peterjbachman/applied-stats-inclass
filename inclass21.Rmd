@@ -108,19 +108,22 @@ data("presidentialForecast")
 
 **SECOND**: for the remaining R code, let's first develop code for each of the steps referenced above before properly structuring them in a for-loop.
 
-1. Start with the assumption that all models are weighted equally.
+1. **Start with the assumption that all models are weighted equally**.
+
+**NOTE**: recall from Montgomery, Hollenbach, and Ward (2012) that the $w_k \in [0,1]$'s are model probabilities associated with each component model's predictive performance.
+In other words, the $w_k \in [0,1]$'s are weights associated each each model such that $\sum_{k=1}^K w_k = 1$.
 
 ```{r}
 
 ```
 
-2. Calculate $\hat{z}_k^{(j+1)t}$ for each model for each election.
+2. **Calculate $\hat{z}_k^{(j+1)t}$ for each model for each election**.
 
 ```{r}
 
 ```
 
-3. Calculate $\hat{w}_k^{(j+1)}$ for each model.
+3. **Calculate $\hat{w}_k^{(j+1)}$ for each model**.
 
 ```{r}
 
