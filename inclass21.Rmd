@@ -108,8 +108,7 @@ data("presidentialForecast")
 
 
 
-```{r rVersion}
-
+```{r eval = FALSE}
 # Eventually wrap everything in a loop, or apply function?
 
 # Calculate zHat
