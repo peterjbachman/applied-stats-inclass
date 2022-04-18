@@ -15,15 +15,15 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{=tex}
 \textbf{Write R and Rcpp code to answer the following questions. Write the code,
   and then show what the computer returns when that code is run. Thoroughly
   comment your solutions.}
-
+```
 Complete this assignment before 10:00am on Wednesday, April 20. Submit the R
 implementation as an Rmarkdown and the knitted PDF to Canvas. Have one group
 member submit the activity with all group members listed at the top. The Rcpp
 portion will be given to you as your final assignment.
-
 
 \section*{In-class Background: The Expectation-Maximization Algorithm}
 
@@ -36,21 +36,23 @@ form the ensemble, and you will use something called the EM
 
 The task is to choose values $w_k$ that maximize the following equation:
 
+```{=tex}
 \begin{equation}
    p(y \vert f_1^{s \vert t^{\star}}, ..., f_K^{s \vert t^{\star}}) = \sum\limits^N_{k=1} w_k N(f_k^{t^{\star}}, \sigma^{2})
 \end{equation}
-
+```
 For the remainder of this assignment, assume that the parameter $\sigma^{2}$ is
-known and that $\sigma^{2} = 1$. 
+known and that $\sigma^{2} = 1$.
 
 The first step of the EM algorithm is to estimate the latent quantity
 $\hat{z}^t_k$ that represents the probability that observation $t$ was best
 predicted by model $k$.
 
+```{=tex}
 \begin{equation}
    \hat{z}_k^{(j+1)t} = \frac{\hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)}{\sum\limits^N_{k=1} \hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)}
 \end{equation}
-
+```
 In this equation, $j$ is the particular iteration of the EM algorithm, and
 $N(y^t \vert f_k^t, 1)$ is the normal cumulative distribution function evaluated
 at the observed election outcome (\texttt{dnorm(y, ftk, 1)}).
@@ -58,30 +60,45 @@ at the observed election outcome (\texttt{dnorm(y, ftk, 1)}).
 The second step of the EM algorithm is to estimate the expected value of the
 weights assuming that all $\hat{z}^{t}_{k}$ are correct.
 
+```{=tex}
 \begin{equation}
    \hat{w}^{(j+1)}_k = \frac{1}{n} \sum_t \hat{z}_k^{(j+1)t}
 \end{equation}
-
+```
 \newpage
 
 The estimation procedure is as follows:
+
+```{=tex}
 \begin{enumerate}
    \item Start with the assumption that all models are weighted equally.
    \item Calculate $\hat{z}_k^{(j+1)t}$ for each model for each election.
    \item Calculate $\hat{w}_k^{(j+1)}$ for each model.
    \item Repeat steps 2-3 twenty times.
 \end{enumerate}
-
+```
 Complete the preceding tasks in \texttt{R} alone.
 
 ```{r rVersion}
 
-```
+# Eventually wrap everything in a loop, or apply function?
 
+# Calculate zHat
+
+# I'm not sure if the indices are in the right places. This is mostly because
+# I'm not entirely sure what's going on
+zHat[i + 1] <- (wHat[i] * dnorm(y[i], ftk[i], 1)) / sum(wHat * dnorm(y, ftk, 1))
+
+# Calculate wHat
+
+# Not sure for the same reasons as above.
+wHat[i + 1] <- sum(zHat) / length(zHat)
+
+```
 
 \section*{Assignment: Rcpp Practice}
 
-
+```{=tex}
 \begin{enumerate}
    \item Write an Rcpp function that will calculate the answer to Equation (2).
      The output will be a matrix.
@@ -89,7 +106,7 @@ Complete the preceding tasks in \texttt{R} alone.
      The output will be a vector.
    \item Write an Rcpp function that will complete the entire algorithm.
 \end{enumerate}
-
+```
 ```{r rcppVersion}
 
 ```
