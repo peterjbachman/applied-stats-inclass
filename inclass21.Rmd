@@ -13,6 +13,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
 ```{=tex}
@@ -87,23 +88,29 @@ Complete the preceding tasks in \texttt{R} alone.
 
   * To learn more about EBMA forecasts and (hopefully) find some toy data to use with our functions, let's install and investigate the `EBMAforecast` package.
 
-```{r}
+```{r tidy = TRUE}
 ## Install package:
+
 #install.packages("EBMAforecast")
 library(EBMAforecast)
 
 ## Read documentation:
+
 #?EBMAforecast
 
 ## Find data used in demo(PresForecast):
+
 #demo(presForecast)
 ```
 
   * Let's load the `presidentialForecast` data from the `EBMAforecast` package:
 
-```{r}
+```{r tidy = TRUE}
 ## Load `presidentialForecast` data from `EBMAforecast` package:
 data("presidentialForecast")
+#?presidentialForecast
+
+## OUTCOME VARIABLE: incumbent-party vote share in each presidential election.
 ```
 
 **SECOND**: for the remaining R code, let's first develop code for each of the steps referenced above before properly structuring them in a for-loop.
@@ -113,8 +120,12 @@ data("presidentialForecast")
 **NOTE**: recall from Montgomery, Hollenbach, and Ward (2012) that the $w_k \in [0,1]$'s are model probabilities associated with each component model's predictive performance.
 In other words, the $w_k \in [0,1]$'s are weights associated each each model such that $\sum_{k=1}^K w_k = 1$.
 
-```{r}
+```{r tidy = TRUE}
+## ASSUMED DATA STRUCTURE: dataframe with:
 
+### `K` columns of models. 
+
+### `n` rows of predictions (substantively, these are the predicted incombent-party vote share for each presidential election).
 ```
 
 2. **Calculate $\hat{z}_k^{(j+1)t}$ for each model for each election**.
