@@ -111,6 +111,8 @@ data("presidentialForecast")
 #?presidentialForecast
 
 ## OUTCOME VARIABLE: incumbent-party vote share in each presidential election.
+
+df <- presidentialForecast
 ```
 
 **SECOND**: for the remaining R code, let's first develop code for each of the steps referenced above before properly structuring them in a for-loop.
@@ -120,12 +122,20 @@ data("presidentialForecast")
 **NOTE**: recall from Montgomery, Hollenbach, and Ward (2012) that the $w_k \in [0,1]$'s are model probabilities associated with each component model's predictive performance.
 In other words, the $w_k \in [0,1]$'s are weights associated each each model such that $\sum_{k=1}^K w_k = 1$.
 
+**ASSUMED DATA STRUCTURE**: dataframe with:
+
+  * `K` columns, which include `K-1` columns of models and `1` column of actual results.
+  
+  * `n` rows of predictions (substantively, these are the predicted incumbent-party vote share for each presidential election).
+
 ```{r tidy = TRUE}
-## ASSUMED DATA STRUCTURE: dataframe with:
+## Find number of models:
+K <- dim(df)[2] - 1
 
-### `K` columns of models. 
+## Define w_hat with all models weighted equally.
+w_hat <- replicate(K,1/K)
 
-### `n` rows of predictions (substantively, these are the predicted incombent-party vote share for each presidential election).
+## COMPLETE!
 ```
 
 2. **Calculate $\hat{z}_k^{(j+1)t}$ for each model for each election**.
