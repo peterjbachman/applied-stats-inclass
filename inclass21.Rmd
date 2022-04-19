@@ -80,7 +80,11 @@ The estimation procedure is as follows:
 ```
 Complete the preceding tasks in \texttt{R} alone.
 
+
+
+
 # **ANSWERS**: R Section.
+
 
 ## **FIRST**: find test data to use on our model.
 
@@ -208,41 +212,66 @@ This step pulls everything together. In brief, there will be one for-loop contai
   
   * **step (3)**: find `K`-length vector $\hat{w}_k^{(j+1)}$ for each model (i.e., for every column in `df`)
 
+
 ```{r eval = FALSE}
 
 # WORK IN PROGRESS!
 
-# Number of models:
-K <- dim(df)[2]
+# PRELIMINARY 1: Number of models:
+K <- dim(df)[2] - 1
 
-# Number of observations:
+# PRELIMINARY 2: Number of observations:
 T <- dim(df)[1]
 
-# Create function that combines steps (2) & (3):
-steps23 <- function(df){
+# PRELIMINARY 3: Create function that combines steps (2) & (3):
+steps23 <- function(df, w_hat = w_hat){
   y <- df[[7]] # Create vector of outcome variables.
-  M <- df[,1:K] # create matrix of models
-  steps2 <- 
+  M <- df[,1:K] # create matrix of models.
+  K <- dim(df)[2] - 1 # Number of models.
+  T <- dim(df)[1] #Number of observations
+  # Create dnorm object for step 2:
+  dnormal <- t(
+    sapply(
+      X = 1:T,
+      FUN = function(t){
+        dnorm(
+          y[t],
+          sapply(
+            X = 1:K,
+            FUN = function(k){df[t,k]}
+            ),
+          sd = 1
+          )
+        }
+      )
+    )
+  # Actually do step 2 function:
+  z_hats <- sapply(
+    X = 1:T,
+    FUN = function(t){
+      (w_hat * dnormal[t,])/(sum(w_hat * dnormal[t,]))
+    }
+  )
+  # Do step 3 function:
+  w_hat <- sapply(
+    X = 1:K,
+    FUN = function(k){
+      sum(z_hats[,k])/T
+    }
+  )
+  return(w_hat)
 }
 
-
-# Step 1:
+# STEP 1: Define w_hat with all models weighted equally.
 w_hat <- replicate(K,1/K)
 
 # Steps 2-4:
-for (i in 20){
-  # Step 1:
-  apply(
-    X = df,
-    FUN = (w_hat * dnorm(y[t], df[t,k], 1))/(sum(w_hat * dnorm(y[t], df[t,k], 1)))
-  )
-  
-  z_hat <- (w_hat * dnorm(y[t], df[t,k], 1))/(sum(w_hat * dnorm(y[t], df[t,k], 1)))
-}
 
-?apply()
+sapply(
+  X = 1:20,
+  FUN = 
+)
 
-# Step 2:
 
 ```
 
