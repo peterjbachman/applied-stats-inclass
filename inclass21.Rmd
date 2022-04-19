@@ -114,7 +114,7 @@ library(EBMAforecast)
 data("presidentialForecast")
 #?presidentialForecast
 
-df <- presidentialForecast
+df <- EBMAforecast::presidentialForecast
 
 ## OUTCOME VARIABLE: incumbent-party vote share in each presidential election. In this dataset, the actual outcome is the column `Actual`.
 y <- df$Actual
@@ -215,9 +215,10 @@ This step pulls everything together. In brief, there will be one for-loop contai
 
 ```{r eval = FALSE}
 # BRINGING IT ALL TOGETHER!
-# WORK IN PROGRESS!
+# FINISHED! WORKING EM ALGORITHM!!
 
-# NOTE: algorithm does not iterate past the first iteration. Can't find out why??
+# Reload data:
+df <- EBMAforecast::presidentialForecast
 
 # PRELIMINARY 1: Number of models:
 K <- dim(df)[2] - 1
@@ -248,17 +249,19 @@ steps23 <- function(df = df, w_hat = wHat_it[i-1,]){
       )
     )
   # Do step 2 function:
-  z_hats <- sapply(
-    X = 1:Ti,
-    FUN = function(t){
-      (w_hat * dnormal[t,])/(sum(w_hat * dnormal[t,]))
-    }
-  )
+  z_hats <- t(
+    sapply(
+      X = 1:Ti,
+      FUN = function(t){
+        (w_hat * dnormal[t,])/(sum(w_hat * dnormal[t,]))
+        }
+      )
+    )
   # Do step 3 function:
   w_hat2 <- sapply(
     X = 1:K,
     FUN = function(k){
-      sum(z_hats[,k])/K # FIXED HERE! PREVIOUSLY `Ti`
+      sum(z_hats[,k])/Ti
     }
   )
   return(w_hat2)
@@ -271,40 +274,28 @@ wHat_it <- matrix(
   nrow = itnum + 1,
   ncol = K
   )
+colnames(wHat_it) <- c("Campbell",
+                       "Lewis-Beck",
+                       "EWT2C2",
+                       "Fair",
+                       "Hibbs",
+                       "Abramowitz"
+                       )
+rownames(wHat_it) <- 0:20
 
 # STEP 1: Define w_hat with all models weighted equally.
 wHat_it[1,] <- replicate(K,1/K)
 
-# Steps 2-4:
+# Steps 2-4 (ITERATION):
 i <- 2 
-while(i < itnum + 1){
+while(i <= itnum + 1){
   wHat_it[i,] <- steps23(df = df, w_hat = wHat_it[i-1,])
   print(i)
   i = i + 1
 }
 
-
-# ATTEMPT AT ITERATION:
-
-i <- 1
-while(i < 21){
-  print(i)
-  i = i + 1
-}
-
-
-
-
-# PRIOR ATTEMPT, DIDN'T WORK:
-#sapply(
-#  X = 2:20,
-#  FUN = function(i){
-#    steps23(df, wHat_it, i = i)
-#  }
-#)
-
-
-
+# FINAL ITERATION:
+wHat_it[21,]
 
 ```
 
@@ -312,6 +303,7 @@ while(i < 21){
 
 ```{r eval = FALSE}
 # ANOTHER DEBUGGING METHOD: manually run each iteration and see what happens.
+# SUCCESS! Correction added to model above.
 df <- EBMAforecast::presidentialForecast # Reload data.
 
 # PRELIMINARY 1: Number of models:
