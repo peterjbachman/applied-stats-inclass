@@ -116,7 +116,7 @@ df <- presidentialForecast
 y <- df$Actual
 
 # Now that the outcome variable `y` is another object, remove column `Actual` from `df`, which now represents the matrix of models (analogous to matrix of X's)
-df <- df[,-7]
+#df <- df[,-7] DISREGARD! NOT DOING FOR NOW!
 ```
 
 ## **SECOND**: implement steps 1-3 above.
@@ -131,7 +131,7 @@ In other words, the $w_k \in [0,1]$'s are weights associated each each model suc
 
   * dataframe `df` with the following dimensions:
 
-    + `K` columns, which include `K` columns of models
+    + `K+1` columns, which include `K` columns of models and `1` column of outcomes (i.e., the actual results of one presidential elections).
   
     + `T` rows of predictions (substantively, these are the predicted incumbent-party vote share for each presidential election).
   
@@ -181,7 +181,9 @@ With this knowledge in mind, let's create code that estimates $\hat{z}_k^{(j+1)t
 
 ## NOTE 4: input `w_hat` and output `z_hat` are vectors of `K` elements.
 
-z_hat <- (w_hat * dnorm(y[t], df[t,k], 1)/(sum(w_hat * dnorm(y[t], df[t,k], 1)))
+z_hat <- (w_hat * dnorm(y[t], df[t,k], 1))/(sum(w_hat * dnorm(y[t], df[t,k], 1)))
+          
+# COMPLETE!
 ```
 
 ### 3. **Calculate $\hat{w}_k^{(j+1)}$ for each model**.
@@ -193,16 +195,54 @@ Whereas step (2) estimated $\hat{z}_k^{(j+1)t}$ (the probability that model `k` 
 
 ## NOTE 2: `T = dim(df)[1]`, or the number of all presidential elections in sample.
 w_hat <- sum(z_hat)/T
+
+# COMPLETE!
 ```
 
 ## **THIRD**: perform step (4). 
 perform step (4) above by creating a for-loop that repeats steps 2-3 twenty times.
 
-This step pulls everything together. In brief, there will be two for-loops:
+This step pulls everything together. In brief, there will be one for-loop containing the two steps from above:
 
-  * The first (or "inner") for-loop will operate on one presidential election `t` at a time. It will perform 
+  * **step (2)**: find `K`-length vector $\hat{z}_k^{(j+1)t}$ for each election (i.e., for every row in `df`). 
+  
+  * **step (3)**: find `K`-length vector $\hat{w}_k^{(j+1)}$ for each model (i.e., for every column in `df`)
 
-```{r}
+```{r eval = FALSE}
+
+# WORK IN PROGRESS!
+
+# Number of models:
+K <- dim(df)[2]
+
+# Number of observations:
+T <- dim(df)[1]
+
+# Create function that combines steps (2) & (3):
+steps23 <- function(df){
+  y <- df[[7]] # Create vector of outcome variables.
+  M <- df[,1:K] # create matrix of models
+  steps2 <- 
+}
+
+
+# Step 1:
+w_hat <- replicate(K,1/K)
+
+# Steps 2-4:
+for (i in 20){
+  # Step 1:
+  apply(
+    X = df,
+    FUN = (w_hat * dnorm(y[t], df[t,k], 1))/(sum(w_hat * dnorm(y[t], df[t,k], 1)))
+  )
+  
+  z_hat <- (w_hat * dnorm(y[t], df[t,k], 1))/(sum(w_hat * dnorm(y[t], df[t,k], 1)))
+}
+
+?apply()
+
+# Step 2:
 
 ```
 
