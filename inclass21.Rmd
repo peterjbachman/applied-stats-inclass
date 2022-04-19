@@ -212,98 +212,10 @@ This step pulls everything together. In brief, there will be one for-loop contai
   
   * **step (3)**: find `K`-length vector $\hat{w}_k^{(j+1)}$ for each model (i.e., for every column in `df`). In brief, we average each column of the matrix from step (2). The result is the new $\hat{w}_k^{(j+1)}$ weights for each model.
 
-
-```{r eval = FALSE}
-# BRINGING IT ALL TOGETHER!
-# FINISHED! WORKING EM ALGORITHM!!
-
-# Reload data:
-df <- EBMAforecast::presidentialForecast
-
-# PRELIMINARY 1: Number of models:
-K <- dim(df)[2] - 1
-
-# PRELIMINARY 2: Number of observations:
-Ti <- dim(df)[1]
-
-# PRELIMINARY 3: Create function that combines steps (2) & (3):
-steps23 <- function(df = df, w_hat = wHat_it[i-1,]){
-  y <- df[[7]] # Create vector of outcome variables.
-  M <- df[,1:K] # create matrix of models.
-  K <- dim(df)[2] - 1 # Number of models.
-  Ti <- dim(df)[1] #Number of observations
-  # Create dnorm object for step 2:
-  dnormal <- t(
-    sapply(
-      X = 1:Ti,
-      FUN = function(t){
-        dnorm(
-          y[t],
-          sapply(
-            X = 1:K,
-            FUN = function(k){df[t,k]}
-            ),
-          sd = 1
-          )
-        }
-      )
-    )
-  # Do step 2 function:
-  z_hats <- t(
-    sapply(
-      X = 1:Ti,
-      FUN = function(t){
-        (w_hat * dnormal[t,])/(sum(w_hat * dnormal[t,]))
-        }
-      )
-    )
-  # Do step 3 function:
-  w_hat2 <- sapply(
-    X = 1:K,
-    FUN = function(k){
-      sum(z_hats[,k])/Ti
-    }
-  )
-  return(w_hat2)
-}
-
-# PRELIMINARY 4: create matrix to collect iterations data. It needs to have 21 rows for the initial w_hat and the 20 iterations of w_hat.
-itnum <- 20 # Number of iterations
-wHat_it <- matrix(
-  data = NA,
-  nrow = itnum + 1,
-  ncol = K
-  )
-colnames(wHat_it) <- c("Campbell",
-                       "Lewis-Beck",
-                       "EWT2C2",
-                       "Fair",
-                       "Hibbs",
-                       "Abramowitz"
-                       )
-rownames(wHat_it) <- 0:20
-
-# STEP 1: Define w_hat with all models weighted equally.
-wHat_it[1,] <- replicate(K,1/K)
-
-# Steps 2-4 (ITERATION):
-i <- 2 
-while(i <= itnum + 1){
-  wHat_it[i,] <- steps23(df = df, w_hat = wHat_it[i-1,])
-  print(i)
-  i = i + 1
-}
-
-# FINAL ITERATION:
-wHat_it[21,]
-
-```
-
-
-
 ```{r eval = FALSE}
 # ANOTHER DEBUGGING METHOD: manually run each iteration and see what happens.
-# SUCCESS! Correction added to model above.
+# SUCCESS! Correction added to final model below.
+
 df <- EBMAforecast::presidentialForecast # Reload data.
 
 # PRELIMINARY 1: Number of models:
@@ -394,21 +306,93 @@ sum_wHat # STILL SUMS TO 1!!
 
 
 
-```{r eval = FALSE}
-# Eventually wrap everything in a loop, or apply function?
+```{r tidy = TRUE}
+# FINISHED! WORKING EM ALGORITHM!!
+# BRINGING IT ALL TOGETHER!
 
-# Calculate zHat
+# Reload data:
+df <- EBMAforecast::presidentialForecast
 
-# I'm not sure if the indices are in the right places. This is mostly because
-# I'm not entirely sure what's going on
-zHat[i + 1] <- (wHat[i] * dnorm(y[i], ftk[i], 1)) / sum(wHat * dnorm(y, ftk, 1))
+# PRELIMINARY 1: Number of models:
+K <- dim(df)[2] - 1
 
-# Calculate wHat
+# PRELIMINARY 2: Number of observations:
+Ti <- dim(df)[1]
 
-# Not sure for the same reasons as above.
-wHat[i + 1] <- sum(zHat) / length(zHat)
+# PRELIMINARY 3: Create function that combines steps (2) & (3):
+steps23 <- function(df = df, w_hat = wHat_it[i-1,]){
+  y <- df[[7]] # Create vector of outcome variables.
+  M <- df[,1:K] # create matrix of models.
+  K <- dim(df)[2] - 1 # Number of models.
+  Ti <- dim(df)[1] #Number of observations
+  # Create dnorm object for step 2:
+  dnormal <- t(
+    sapply(
+      X = 1:Ti,
+      FUN = function(t){
+        dnorm(
+          y[t],
+          sapply(
+            X = 1:K,
+            FUN = function(k){df[t,k]}
+            ),
+          sd = 1
+          )
+        }
+      )
+    )
+  # Do step 2 function:
+  z_hats <- t(
+    sapply(
+      X = 1:Ti,
+      FUN = function(t){
+        (w_hat * dnormal[t,])/(sum(w_hat * dnormal[t,]))
+        }
+      )
+    )
+  # Do step 3 function:
+  w_hat2 <- sapply(
+    X = 1:K,
+    FUN = function(k){
+      sum(z_hats[,k])/Ti
+    }
+  )
+  return(w_hat2)
+}
+
+# PRELIMINARY 4: create matrix to collect iterations data. It needs to have 21 rows for the initial w_hat and the 20 iterations of w_hat.
+itnum <- 20 # Number of iterations
+wHat_it <- matrix(
+  data = NA,
+  nrow = itnum + 1,
+  ncol = K
+  )
+colnames(wHat_it) <- c("Campbell",
+                       "Lewis-Beck",
+                       "EWT2C2",
+                       "Fair",
+                       "Hibbs",
+                       "Abramowitz"
+                       )
+rownames(wHat_it) <- 0:20
+
+# STEP 1: Define w_hat with all models weighted equally.
+wHat_it[1,] <- replicate(K,1/K)
+
+# Steps 2-4 (ITERATION):
+i <- 2 
+while(i <= itnum + 1){
+  wHat_it[i,] <- steps23(df = df, w_hat = wHat_it[i-1,])
+  print(i)
+  i = i + 1
+}
+
+# FINAL ITERATION:
+wHat_it[21,]
 
 ```
+
+
 
 \section*{Assignment: Rcpp Practice}
 
