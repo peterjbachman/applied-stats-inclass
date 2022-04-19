@@ -223,18 +223,18 @@ This step pulls everything together. In brief, there will be one for-loop contai
 K <- dim(df)[2] - 1
 
 # PRELIMINARY 2: Number of observations:
-T <- dim(df)[1]
+Ti <- dim(df)[1]
 
 # PRELIMINARY 3: Create function that combines steps (2) & (3):
 steps23 <- function(df = df, w_hat = wHat_it[i-1,]){
   y <- df[[7]] # Create vector of outcome variables.
   M <- df[,1:K] # create matrix of models.
   K <- dim(df)[2] - 1 # Number of models.
-  T <- dim(df)[1] #Number of observations
+  Ti <- dim(df)[1] #Number of observations
   # Create dnorm object for step 2:
   dnormal <- t(
     sapply(
-      X = 1:T,
+      X = 1:Ti,
       FUN = function(t){
         dnorm(
           y[t],
@@ -249,7 +249,7 @@ steps23 <- function(df = df, w_hat = wHat_it[i-1,]){
     )
   # Do step 2 function:
   z_hats <- sapply(
-    X = 1:T,
+    X = 1:Ti,
     FUN = function(t){
       (w_hat * dnormal[t,])/(sum(w_hat * dnormal[t,]))
     }
@@ -258,7 +258,7 @@ steps23 <- function(df = df, w_hat = wHat_it[i-1,]){
   w_hat2 <- sapply(
     X = 1:K,
     FUN = function(k){
-      sum(z_hats[,k])/T
+      sum(z_hats[,k])/Ti
     }
   )
   return(w_hat2)
