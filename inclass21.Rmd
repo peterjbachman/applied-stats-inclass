@@ -80,17 +80,17 @@ The estimation procedure is as follows:
 ```
 Complete the preceding tasks in \texttt{R} alone.
 
-
-
-
 # **ANSWERS**: R Section.
-
 
 ## **FIRST**: find test data to use on our model.
 
-  * we use the Expectation-Maximization (EM) algorithm on datasets that combine multiple linear models. In this case, we combine different forecasts of US presidential elections using EBMA.
+-   we use the Expectation-Maximization (EM) algorithm on datasets that combine
+    multiple linear models. In this case, we combine different forecasts of US
+    presidential elections using EBMA.
 
-  * To learn more about EBMA forecasts and (hopefully) find some toy data to use with our functions, let's install and investigate the `EBMAforecast` package.
+-   To learn more about EBMA forecasts and (hopefully) find some toy data to use
+    with our functions, let's install and investigate the `EBMAforecast`
+    package.
 
 ```{r tidy = TRUE}
 ## Install package:
@@ -107,7 +107,7 @@ library(EBMAforecast)
 #demo(presForecast)
 ```
 
-  * Let's load the `presidentialForecast` data from the `EBMAforecast` package:
+-   Let's load the `presidentialForecast` data from the `EBMAforecast` package:
 
 ```{r tidy = TRUE}
 ## Load `presidentialForecast` data from `EBMAforecast` package:
@@ -124,24 +124,31 @@ y <- df$Actual
 ```
 
 ## **SECOND**: implement steps 1-3 above.
-For the remaining R code, let's first develop code for each of the steps referenced above before properly structuring them in a for-loop.
+
+For the remaining R code, let's first develop code for each of the steps
+referenced above before properly structuring them in a for-loop.
 
 ### 1. **Start with the assumption that all models are weighted equally**.
 
-**NOTE**: recall from Montgomery, Hollenbach, and Ward (2012) that the $w_k \in [0,1]$'s are model probabilities associated with each component model's predictive performance.
-In other words, the $w_k \in [0,1]$'s are weights associated each each model such that $\sum_{k=1}^K w_k = 1$.
+**NOTE**: recall from Montgomery, Hollenbach, and Ward (2012) that the
+$w_k \in [0,1]$'s are model probabilities associated with each component model's
+predictive performance. In other words, the $w_k \in [0,1]$'s are weights
+associated each each model such that $\sum_{k=1}^K w_k = 1$.
 
-**ASSUMED DATA STRUCTURE**: 
+**ASSUMED DATA STRUCTURE**:
 
-  * dataframe `df` with the following dimensions:
+-   dataframe `df` with the following dimensions:
 
-    + `K+1` columns, which include `K` columns of models and `1` column of outcomes (i.e., the actual results of one presidential elections).
-  
-    + `T` rows of predictions (substantively, these are the predicted incumbent-party vote share for each presidential election).
-  
-  * Vector `y` with `T` elements. 
+    -   `K+1` columns, which include `K` columns of models and `1` column of
+        outcomes (i.e., the actual results of one presidential elections).
 
-    + Each element $t \in T$ of `y` represents the actual results of one presidential election.
+    -   `T` rows of predictions (substantively, these are the predicted
+        incumbent-party vote share for each presidential election).
+
+-   Vector `y` with `T` elements.
+
+    -   Each element $t \in T$ of `y` represents the actual results of one
+        presidential election.
 
 ```{r tidy = TRUE}
 ## Find number of models:
@@ -156,26 +163,46 @@ w_hat <- replicate(K,1/K)
 ## COMPLETE!
 ```
 
-### 2. **Calculate $\hat{z}_k^{(j+1)t}$ for each model for each election**.
+### 2. **Calculate** $\hat{z}_k^{(j+1)t}$ for each model for each election.
 
-**NOTE**: the function $\hat{z}_k^{(j+1)t} = \frac{\hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)}{\sum\limits^N_{k=1} \hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)}$ is complex, containing several unexplained terms. Let's consider each of these terms:
+**NOTE**: the function
+$\hat{z}_k^{(j+1)t} = \frac{\hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)}{\sum\limits^N_{k=1} \hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)}$
+is complex, containing several unexplained terms. Let's consider each of these
+terms:
 
-  * Recall from above that `j` represents the prior iteration of the EM algorithm, so the EM algorithm is recursive. 
-  
-  * Also recall from above that $\hat{z}_k^t$ is the probability that observation `t`  (i.e., a particular presidential election; one row in the test dataset) was best predicted by model `k` (i.e., one column in the test dataset).
-  
-  * Also recall from above that $\hat{w}_k^{(j)}$ is the probability weights for each model `k`. We assume that all $\hat{w}_k^{(j)}$'s in the first iteration.
-  
-  * $y^t$ is the *actual* election result of presidential election `t` (i.e., row `t`'s entry of column `Actual` in the test dataset).
-  
-  * $f_k^t$ is model `k`'s *predicted* election result for presidential election `t` (i.e., row `t`'s entry of column associated with model `k`).
-  
-  * $N(y^t \vert f_k^t, 1)$, then, is the probability that model `k` found predicted outcome $f_k^t$ for presidential election `t` given that the sample distribution is normally distributed around the actual outcome $y^t$ with st. dev. $\sigma^2 = 1$ Generate $N(y^t \vert f_k^t, 1)$ using `norm(y, ftk, 1)` where `y` $=y^t$ and `ftk` $=f_k^t$.
-  
-  * Finally, note that the outcome of this step will be a vector because the numerator $\hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)$ is a vector of `K` elements for EACH model's `w_hat`, while the denominator $\sum\limits^N_{k=1} \hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)$ is a scalar that's the sum of the numerator for each model `k`.
-  
-With this knowledge in mind, let's create code that estimates $\hat{z}_k^{(j+1)t}$:
-  
+-   Recall from above that `j` represents the prior iteration of the EM
+    algorithm, so the EM algorithm is recursive.
+
+-   Also recall from above that $\hat{z}_k^t$ is the probability that
+    observation `t` (i.e., a particular presidential election; one row in the
+    test dataset) was best predicted by model `k` (i.e., one column in the test
+    dataset).
+
+-   Also recall from above that $\hat{w}_k^{(j)}$ is the probability weights for
+    each model `k`. We assume that all $\hat{w}_k^{(j)}$'s in the first
+    iteration.
+
+-   $y^t$ is the *actual* election result of presidential election `t` (i.e.,
+    row `t`'s entry of column `Actual` in the test dataset).
+
+-   $f_k^t$ is model `k`'s *predicted* election result for presidential election
+    `t` (i.e., row `t`'s entry of column associated with model `k`).
+
+-   $N(y^t \vert f_k^t, 1)$, then, is the probability that model `k` found
+    predicted outcome $f_k^t$ for presidential election `t` given that the
+    sample distribution is normally distributed around the actual outcome $y^t$
+    with st. dev. $\sigma^2 = 1$ Generate $N(y^t \vert f_k^t, 1)$ using
+    `norm(y, ftk, 1)` where `y` $=y^t$ and `ftk` $=f_k^t$.
+
+-   Finally, note that the outcome of this step will be a vector because the
+    numerator $\hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)$ is a vector of `K`
+    elements for EACH model's `w_hat`, while the denominator
+    $\sum\limits^N_{k=1} \hat{w}_k^{(j)} N(y^t \vert f_k^t, 1)$ is a scalar
+    that's the sum of the numerator for each model `k`.
+
+With this knowledge in mind, let's create code that estimates
+$\hat{z}_k^{(j+1)t}$:
+
 ```{r eval = FALSE}
 ## NOTE 1: `y = df$Actual`.
 
@@ -190,9 +217,13 @@ z_hat <- (w_hat * dnorm(y[t], df[t,k], 1))/(sum(w_hat * dnorm(y[t], df[t,k], 1))
 # COMPLETE!
 ```
 
-### 3. **Calculate $\hat{w}_k^{(j+1)}$ for each model**.
+### 3. **Calculate** $\hat{w}_k^{(j+1)}$ for each model.
 
-Whereas step (2) estimated $\hat{z}_k^{(j+1)t}$ (the probability that model `k` best predicted the outcome of ONE presidential election `t`), step (3) determines the next iteration's $\hat{w}_k^{(j+1)}$ (i.e., the weight associated with model `k`) by finding the average $\hat{z}_k^{(j+1)t}$ over ALL presidential elections (i.e., $\forall t \in T$).
+Whereas step (2) estimated $\hat{z}_k^{(j+1)t}$ (the probability that model `k`
+best predicted the outcome of ONE presidential election `t`), step (3)
+determines the next iteration's $\hat{w}_k^{(j+1)}$ (i.e., the weight associated
+with model `k`) by finding the average $\hat{z}_k^{(j+1)t}$ over ALL
+presidential elections (i.e., $\forall t \in T$).
 
 ```{r eval = FALSE}
 ## NOTE 1: input `z_hat` and output `w_hat` are vectors of `K` elements.
@@ -203,14 +234,22 @@ w_hat <- sum(z_hat)/T
 # COMPLETE!
 ```
 
-## **THIRD**: perform step (4). 
-perform step (4) above by creating a for-loop that repeats steps 2-3 twenty times.
+## **THIRD**: perform step (4).
 
-This step pulls everything together. In brief, there will be one for-loop containing the two steps from above:
+perform step (4) above by creating a for-loop that repeats steps 2-3 twenty
+times.
 
-  * **step (2)**: find `T`-by-`K` matrix of `T` vectors containing `K` elements $\hat{z}_k^{(j+1)t}$ for each election (i.e., for every row in `df`). In other words, each row in the matrix is a $\hat{z}_k^{(j+1)t}$.
-  
-  * **step (3)**: find `K`-length vector $\hat{w}_k^{(j+1)}$ for each model (i.e., for every column in `df`). In brief, we average each column of the matrix from step (2). The result is the new $\hat{w}_k^{(j+1)}$ weights for each model.
+This step pulls everything together. In brief, there will be one for-loop
+containing the two steps from above:
+
+-   **step (2)**: find `T`-by-`K` matrix of `T` vectors containing `K` elements
+    $\hat{z}_k^{(j+1)t}$ for each election (i.e., for every row in `df`). In
+    other words, each row in the matrix is a $\hat{z}_k^{(j+1)t}$.
+
+-   **step (3)**: find `K`-length vector $\hat{w}_k^{(j+1)}$ for each model
+    (i.e., for every column in `df`). In brief, we average each column of the
+    matrix from step (2). The result is the new $\hat{w}_k^{(j+1)}$ weights for
+    each model.
 
 ```{r eval = FALSE}
 # ANOTHER DEBUGGING METHOD: manually run each iteration and see what happens.
@@ -265,7 +304,8 @@ steps23 <- function(df = df, w_hat = wHat_it[i-1,]){
   return(w_hat2)
 }
 
-# PRELIMINARY 4: create matrix to collect iterations data. It needs to have 21 rows for the initial w_hat and the 20 iterations of w_hat.
+# PRELIMINARY 4: create matrix to collect iterations data. It needs to have 21
+# rows for the initial w_hat and the 20 iterations of w_hat.
 itnum <- 20 # Number of iterations
 wHat_it <- matrix(
   data = NA,
@@ -301,10 +341,6 @@ sum_wHat # STILL SUMS TO 1!!
 # IT'S WORKING!!!!
 
 ```
-
-
-
-
 
 ```{r tidy = TRUE}
 # FINISHED! WORKING EM ALGORITHM!!
@@ -360,7 +396,8 @@ steps23 <- function(df = df, w_hat = wHat_it[i-1,]){
   return(w_hat2)
 }
 
-# PRELIMINARY 4: create matrix to collect iterations data. It needs to have 21 rows for the initial w_hat and the 20 iterations of w_hat.
+# PRELIMINARY 4: create matrix to collect iterations data. It needs to have 21
+# rows for the initial w_hat and the 20 iterations of w_hat.
 itnum <- 20 # Number of iterations
 wHat_it <- matrix(
   data = NA,
@@ -392,8 +429,6 @@ wHat_it[21,]
 
 ```
 
-
-
 \section*{Assignment: Rcpp Practice}
 
 ```{=tex}
@@ -406,6 +441,145 @@ wHat_it[21,]
 \end{enumerate}
 ```
 ```{r rcppVersion}
+library(Rcpp)
 
+# EQUATION 2 -------------------------------------------------------------------
+cppFunction('NumericMatrix rCppStep2(NumericMatrix x, NumericVector y, NumericVector weights, double sd){
+  int rows = x.nrow();
+  NumericMatrix dNormal(x);
+  NumericMatrix out(x);
+
+  for (int i = 0; i < x.nrow(); ++i) {
+    for (int j = 0; j < x.ncol(); ++j) {
+      double datNumber = R::dnorm(y[i], x(i,j), sd, FALSE);
+      dNormal(i,j) =  datNumber; // 
+    }
+  }
+
+  NumericVector sums(rows);
+  for (int i = 0; i < rows; ++i) {
+  
+    double rowSum = 0;
+    for (int j = 0; j < dNormal.ncol(); ++j) {
+      rowSum += weights[j] * dNormal(i,j);
+    }
+  sums[i] = rowSum;
+  }
+  
+  for (int i = 0; i < x.nrow(); ++i) {
+    for (int j = 0; j < x.ncol(); ++j) {
+      out(i,j) =  weights[j] * dNormal(i,j) / sums[i]; // 
+    }
+  }
+
+  return out;
+}')
+
+# EQUATION 3 -------------------------------------------------------------------
+cppFunction('NumericVector rCppStep3(NumericMatrix zHat) {
+  int rows = zHat.nrow();
+  int cols = zHat.ncol();
+  NumericVector out(cols);
+  
+  for (int j = 0; j < zHat.ncol(); ++j) {
+  
+    double newWeight = 0;
+    for (int i = 0; i < zHat.nrow(); ++i) {
+      newWeight +=  zHat(i,j);
+    }
+  out[j] = newWeight / rows;
+  }
+  return out;
+}')
+
+# WHOLE ALGORITHM --------------------------------------------------------------
+src <- "#include <Rcpp.h>
+using namespace Rcpp;
+// [[Rcpp::export]]
+
+NumericMatrix rCppStep2(NumericMatrix x, NumericVector y, NumericVector weights, double sd){
+  int rows = x.nrow();
+  NumericMatrix dNormal(x);
+  NumericMatrix out(x);
+
+  for (int i = 0; i < x.nrow(); ++i) {
+    for (int j = 0; j < x.ncol(); ++j) {
+      double datNumber = R::dnorm(y[i], x(i,j), sd, FALSE);
+      dNormal(i,j) =  datNumber; // 
+    }
+  }
+
+  NumericVector sums(rows);
+  for (int i = 0; i < rows; ++i) {
+  
+    double rowSum = 0;
+    for (int j = 0; j < dNormal.ncol(); ++j) {
+      rowSum += weights[j] * dNormal(i,j);
+    }
+  sums[i] = rowSum;
+  }
+  
+  for (int i = 0; i < x.nrow(); ++i) {
+    for (int j = 0; j < x.ncol(); ++j) {
+      out(i,j) =  weights[j] * dNormal(i,j) / sums[i]; // 
+    }
+  }
+
+  return out;
+}
+
+// [[Rcpp::export]]
+NumericVector rCppStep3(NumericMatrix zHat) {
+  int rows = zHat.nrow();
+  int cols = zHat.ncol();
+  NumericVector out(cols);
+  
+  for (int j = 0; j < zHat.ncol(); ++j) {
+  
+    double newWeight = 0;
+    for (int i = 0; i < zHat.nrow(); ++i) {
+      newWeight +=  zHat(i,j);
+    }
+  out[j] = newWeight / rows;
+  }
+  return out;
+}
+
+// [[Rcpp::export]]
+NumericVector rCppEBMA(NumericMatrix x, NumericVector y, NumericVector weights, double sd, int iterations){
+NumericMatrix w((iterations + 1), x.ncol());
+w( 0 , _ ) = weights;
+
+for (int i = 0; i < iterations; ++i){
+  w((i + 1), _ ) = rCppStep3(rCppStep2(x, y, w(i, _ ), sd));
+}
+
+return w( iterations , _ );
+}"
+
+sourceCpp(code = src)
+
+df <- EBMAforecast::presidentialForecast
+x <- df[,1:6]
+y <- df[,7]
+wHat <- replicate(dim(x)[2],1/dim(x)[2])
+
+zHat <- rCppStep2(as.matrix(x), y, wHat, 1)
+weights <- rCppStep3(zHat)
+
+# This doesn't work past 1 iteration and I have no clue why and at this point
+# I'm too frustrated to find out why. Not sure how we were expected to implement
+# this all in rcpp considering we didn't go over matrices in rcpp or how to
+# overwrite objects in rcpp (which I'm assuming we can't) I'm just throwing this
+# in a loop and calling it good.
+# 
+# I'm curious on how this could have been implemented. Please let me know
+# -- Peter
+rCppEBMA(as.matrix(x), y, wHat, 1, 2)
+
+for (i in 1:20) {
+  zHat <- rCppStep2(as.matrix(x), y, wHat, 1)
+  wHat <- rCppStep3(zHat)
+}
+wHat
 ```
-
