@@ -82,6 +82,13 @@ Complete the preceding tasks in \texttt{R} alone.
 
 # **ANSWERS**: R Section.
 
+<<<<<<< HEAD
+=======
+
+**FINISHED EM ALGORITHM AT BOTTOM OF R CODE SECTION**
+
+
+>>>>>>> 95446a40e1987b6ef10e7e3fa89ce24c264745e9
 ## **FIRST**: find test data to use on our model.
 
 -   we use the Expectation-Maximization (EM) algorithm on datasets that combine
@@ -93,6 +100,8 @@ Complete the preceding tasks in \texttt{R} alone.
     package.
 
 ```{r tidy = TRUE}
+# FINISHED EM ALGORITHM AT BOTTOM OF R CODE SECTION.
+
 ## Install package:
 
 #install.packages("EBMAforecast")
@@ -110,6 +119,8 @@ library(EBMAforecast)
 -   Let's load the `presidentialForecast` data from the `EBMAforecast` package:
 
 ```{r tidy = TRUE}
+# FINISHED EM ALGORITHM AT BOTTOM OF SECTION.
+
 ## Load `presidentialForecast` data from `EBMAforecast` package:
 data("presidentialForecast")
 #?presidentialForecast
@@ -119,8 +130,8 @@ df <- EBMAforecast::presidentialForecast
 ## OUTCOME VARIABLE: incumbent-party vote share in each presidential election. In this dataset, the actual outcome is the column `Actual`.
 y <- df$Actual
 
-# Now that the outcome variable `y` is another object, remove column `Actual` from `df`, which now represents the matrix of models (analogous to matrix of X's)
-#df <- df[,-7] DISREGARD! NOT DOING FOR NOW!
+# Now that the outcome variable `y` is another object, remove column `Actual` from `df`, which now 
+# represents the matrix of models (analogous to matrix of X's)
 ```
 
 ## **SECOND**: implement steps 1-3 above.
@@ -151,6 +162,8 @@ associated each each model such that $\sum_{k=1}^K w_k = 1$.
         presidential election.
 
 ```{r tidy = TRUE}
+# SKIP, FINISHED EM ALGORITHM AT BOTTOM OF SECTION.
+
 ## Find number of models:
 K <- dim(df)[2] - 1
 
@@ -204,6 +217,8 @@ With this knowledge in mind, let's create code that estimates
 $\hat{z}_k^{(j+1)t}$:
 
 ```{r eval = FALSE}
+# SKIP, FINISHED EM ALGORITHM AT BOTTOM OF SECTION.
+
 ## NOTE 1: `y = df$Actual`.
 
 ## NOTE 2: `k` denotes the current model (column `k` of `K`).
@@ -226,6 +241,8 @@ with model `k`) by finding the average $\hat{z}_k^{(j+1)t}$ over ALL
 presidential elections (i.e., $\forall t \in T$).
 
 ```{r eval = FALSE}
+# SKIP, FINISHED EM ALGORITHM AT BOTTOM OF SECTION.
+
 ## NOTE 1: input `z_hat` and output `w_hat` are vectors of `K` elements.
 
 ## NOTE 2: `T = dim(df)[1]`, or the number of all presidential elections in sample.
@@ -252,6 +269,8 @@ containing the two steps from above:
     each model.
 
 ```{r eval = FALSE}
+# SKIP, FINISHED EM ALGORITHM AT BOTTOM OF SECTION.
+
 # ANOTHER DEBUGGING METHOD: manually run each iteration and see what happens.
 # SUCCESS! Correction added to final model below.
 
@@ -411,7 +430,7 @@ colnames(wHat_it) <- c("Campbell",
                        "Hibbs",
                        "Abramowitz"
                        )
-rownames(wHat_it) <- 0:20
+rownames(wHat_it) <- 0:itnum
 
 # STEP 1: Define w_hat with all models weighted equally.
 wHat_it[1,] <- replicate(K,1/K)
@@ -425,8 +444,7 @@ while(i <= itnum + 1){
 }
 
 # FINAL ITERATION:
-wHat_it[21,]
-
+wHat_it[tail(itnum,1),]
 ```
 
 \section*{Assignment: Rcpp Practice}
