@@ -86,6 +86,9 @@ Complete the preceding tasks in \texttt{R} alone.
 # **ANSWERS**: R Section.
 
 
+**FINISHED EM ALGORITHM AT BOTTOM OF R CODE SECTION**
+
+
 ## **FIRST**: find test data to use on our model.
 
   * we use the Expectation-Maximization (EM) algorithm on datasets that combine multiple linear models. In this case, we combine different forecasts of US presidential elections using EBMA.
@@ -93,6 +96,8 @@ Complete the preceding tasks in \texttt{R} alone.
   * To learn more about EBMA forecasts and (hopefully) find some toy data to use with our functions, let's install and investigate the `EBMAforecast` package.
 
 ```{r tidy = TRUE}
+# FINISHED EM ALGORITHM AT BOTTOM OF R CODE SECTION.
+
 ## Install package:
 
 #install.packages("EBMAforecast")
@@ -110,6 +115,8 @@ library(EBMAforecast)
   * Let's load the `presidentialForecast` data from the `EBMAforecast` package:
 
 ```{r tidy = TRUE}
+# FINISHED EM ALGORITHM AT BOTTOM OF SECTION.
+
 ## Load `presidentialForecast` data from `EBMAforecast` package:
 data("presidentialForecast")
 #?presidentialForecast
@@ -119,8 +126,8 @@ df <- EBMAforecast::presidentialForecast
 ## OUTCOME VARIABLE: incumbent-party vote share in each presidential election. In this dataset, the actual outcome is the column `Actual`.
 y <- df$Actual
 
-# Now that the outcome variable `y` is another object, remove column `Actual` from `df`, which now represents the matrix of models (analogous to matrix of X's)
-#df <- df[,-7] DISREGARD! NOT DOING FOR NOW!
+# Now that the outcome variable `y` is another object, remove column `Actual` from `df`, which now 
+# represents the matrix of models (analogous to matrix of X's)
 ```
 
 ## **SECOND**: implement steps 1-3 above.
@@ -144,6 +151,8 @@ In other words, the $w_k \in [0,1]$'s are weights associated each each model suc
     + Each element $t \in T$ of `y` represents the actual results of one presidential election.
 
 ```{r tidy = TRUE}
+# SKIP, FINISHED EM ALGORITHM AT BOTTOM OF SECTION.
+
 ## Find number of models:
 K <- dim(df)[2] - 1
 
@@ -177,6 +186,8 @@ w_hat <- replicate(K,1/K)
 With this knowledge in mind, let's create code that estimates $\hat{z}_k^{(j+1)t}$:
   
 ```{r eval = FALSE}
+# SKIP, FINISHED EM ALGORITHM AT BOTTOM OF SECTION.
+
 ## NOTE 1: `y = df$Actual`.
 
 ## NOTE 2: `k` denotes the current model (column `k` of `K`).
@@ -195,6 +206,8 @@ z_hat <- (w_hat * dnorm(y[t], df[t,k], 1))/(sum(w_hat * dnorm(y[t], df[t,k], 1))
 Whereas step (2) estimated $\hat{z}_k^{(j+1)t}$ (the probability that model `k` best predicted the outcome of ONE presidential election `t`), step (3) determines the next iteration's $\hat{w}_k^{(j+1)}$ (i.e., the weight associated with model `k`) by finding the average $\hat{z}_k^{(j+1)t}$ over ALL presidential elections (i.e., $\forall t \in T$).
 
 ```{r eval = FALSE}
+# SKIP, FINISHED EM ALGORITHM AT BOTTOM OF SECTION.
+
 ## NOTE 1: input `z_hat` and output `w_hat` are vectors of `K` elements.
 
 ## NOTE 2: `T = dim(df)[1]`, or the number of all presidential elections in sample.
@@ -213,6 +226,8 @@ This step pulls everything together. In brief, there will be one for-loop contai
   * **step (3)**: find `K`-length vector $\hat{w}_k^{(j+1)}$ for each model (i.e., for every column in `df`). In brief, we average each column of the matrix from step (2). The result is the new $\hat{w}_k^{(j+1)}$ weights for each model.
 
 ```{r eval = FALSE}
+# SKIP, FINISHED EM ALGORITHM AT BOTTOM OF SECTION.
+
 # ANOTHER DEBUGGING METHOD: manually run each iteration and see what happens.
 # SUCCESS! Correction added to final model below.
 
