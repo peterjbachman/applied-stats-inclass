@@ -374,7 +374,7 @@ colnames(wHat_it) <- c("Campbell",
                        "Hibbs",
                        "Abramowitz"
                        )
-rownames(wHat_it) <- 0:20
+rownames(wHat_it) <- 0:itnum
 
 # STEP 1: Define w_hat with all models weighted equally.
 wHat_it[1,] <- replicate(K,1/K)
@@ -388,8 +388,7 @@ while(i <= itnum + 1){
 }
 
 # FINAL ITERATION:
-wHat_it[21,]
-
+wHat_it[tail(itnum,1),]
 ```
 
 
