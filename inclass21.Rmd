@@ -82,14 +82,7 @@ Complete the preceding tasks in \texttt{R} alone.
 
 # **ANSWERS**: R Section.
 
-<<<<<<< HEAD
-=======
-
 **FINISHED EM ALGORITHM AT BOTTOM OF R CODE SECTION**
-
-
->>>>>>> 95446a40e1987b6ef10e7e3fa89ce24c264745e9
-## **FIRST**: find test data to use on our model.
 
 -   we use the Expectation-Maximization (EM) algorithm on datasets that combine
     multiple linear models. In this case, we combine different forecasts of US
